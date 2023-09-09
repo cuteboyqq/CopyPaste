@@ -13,8 +13,11 @@ class BaseDatasets:
         # bdd100k datasets
         self.img_dir = args.img_dir
         self.dri_dir = args.dri_dir
+        self.label_dir = args.label_dir
         self.img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
         
+
+
         self.data_info = []
 
         for im_path in self.img_path_list:
@@ -23,6 +26,9 @@ class BaseDatasets:
             dri_path = os.path.join(self.dri_dir,dri_file)
             im = cv2.imread(im_path)
             dri = cv2.imread(dri_path)
+            
+            label_file = self.im_name +  ".txt"
+            label_path = os.path.join(self.label_dir,label_file)
 
             vanish_y = 0
             get_vanish_y = False
@@ -32,12 +38,16 @@ class BaseDatasets:
                         vanish_y = i
                         get_vanish_y = True
 
-            self.data_info.append([im_path,     dri_path,   im,     dri,    vanish_y])
+            self.data_info.append([im_path,     dri_path,   im,     dri,    vanish_y,   label_path])
         
         # roi datasets
         self.roi_label = args.roi_label
         self.roi_dir = args.roi_dir
         self.mask_dir = args.mask_dir
+
+
+        # Save
+        self.save_imdir = args.save_imdir
 
     def Parse_path(self):
         self.im  = self.im_path.split("//")[-1]
