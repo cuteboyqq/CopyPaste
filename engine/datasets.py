@@ -163,7 +163,10 @@ class BaseDatasets:
         ## floor(Down) boundary
         if y_c+int(final_roi_h/2.0)+y_add>=self.im.shape[0]:
             y_c = self.im.shape[0]-(int(final_roi_h/2.0)+y_add+1)
-
+            
+        print("after update x_c,y_c")
+        print("x_c = {}".format(x_c))
+        print("y_c = {}".format(y_c))
         return x_c, y_c
 
     def CopyPaste(self):
