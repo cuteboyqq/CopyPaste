@@ -48,8 +48,7 @@ class BaseDatasets:
 
 
         # Save
-        self.save_imdir = args.save_imdir
-        self.save_labeldir = args.save_labeldir
+        self.save_dir = args.save_dir
 
     def Parse_path(self):
         self.im  = self.im_path.split("//")[-1]
@@ -152,16 +151,16 @@ class BaseDatasets:
                 y = str( int(float( (y) / self.im.shape[0] )*1000000)/1000000 )
                 w = str( int((roi.shape[1]/self.im.shape[1])*1000000)/1000000)
                 h = str( int((roi.shape[0]/self.im.shape[0])*1000000)/1000000)
-                line = str(l) + " " + x + " " + y + " " + w + " " +h
-
-                add_line = str(l) + " " + str(x) + " " + str(y) + " " + str(w) + " " + str(h)
+                add_line = str(l) + " " + x + " " + y + " " + w + " " +h
 
                 ## Get corresponding label path
                 img_file = self.im_path.split("/")[-1]
                 img_filename = img_file.split(".")[0]
 
                 label_file = img_filename+".txt"
-                save_label_path = os.path.join(self.save_labeldir,label_file)
+                save_label_dir = os.path.join(self.save_dir,"labels")
+                os.makedirs(save_label_dir,exist_ok=True)
+                save_label_path = os.path.join(save_label_dir,label_file)
 
                 ## open save label.txt
                 f_new=open(save_label_path,"a")
@@ -209,9 +208,10 @@ class BaseDatasets:
                     self.im[y1:y2,x1:x2] = roi_tmp
                     
                 ## Save image
-                os.makedirs(self.save_imdir,exist_ok=True)
+                save_im_dir = os.path.join(self.save_dir,"images")
+                os.makedirs(save_im_dir,exist_ok=True)
                 img_file = self.im_path.split("/")[-1]
-                save_img_path = os.path.join(self.save_imdir,img_file)
+                save_img_path = os.path.join(save_im_dir,img_file)
 
                 if self.method == "opencv":
                     cv2.imwrite(save_img_path,output)

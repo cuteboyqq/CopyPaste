@@ -9,10 +9,10 @@ def get_args_StopSign():
     parser = argparse.ArgumentParser()
     parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
-    parser.add_argument('-drilabeldir','--dri-labeldir',help='drivable label dir', \
+    parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
     # For StopSign parameter
-    parser.add_argument('-roidirstopsign','--roi-dirstopsign',help='roi dir',\
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',\
                         default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/datasets/stop_sign_new_v87/roi")
     parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/stopsign_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save stopsign fake images')
