@@ -54,11 +54,11 @@ class StopSignDataset(BaseDatasets):
         if self.roi_w > 300:
             roi_w_pre = self.roi_w
             self.roi_w = 300
-            self.roi_h = int(self.roi_h * float(350/roi_w_pre))
+            self.roi_h = int(self.roi_h * float(300/roi_w_pre))
         elif self.roi_h > 300:
             roi_h_pre = self.roi_h
             self.roi_h = 300
-            self.roi_w = int(self.roi_w * float(350/roi_h_pre))
+            self.roi_w = int(self.roi_w * float(300/roi_h_pre))
 
         self.roi_resized = cv2.resize(roi,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
         self.roi_mask = cv2.resize(roi_mask,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
