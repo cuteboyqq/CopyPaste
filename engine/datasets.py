@@ -93,7 +93,7 @@ class BaseDatasets:
         # return (x,y)
         return NotImplementedError
 
-    def Get_ROI_WH_In_Image(self):
+    def Get_ROI_WH_In_Image(self,roi,roi_mask,dri_path)):
         # w = 50
         # h = 50
         # return (w,h)
@@ -103,9 +103,9 @@ class BaseDatasets:
     
         return NotImplementedError
 
-    def Get_ROI_lxywh_In_Image(self,roi,roi_mask):
+    def Get_ROI_lxywh_In_Image(self,roi,roi_mask, dri_path):
         x,y  = self.Get_ROI_XY_In_Image()
-        w,h,roi,mask = self.Get_ROI_WH_In_Image(roi,roi_mask)
+        w,h,roi,mask = self.Get_ROI_WH_In_Image(roi,roi_mask,dri_path)
         label = self.Get_ROI_Label()
         return (label,x,y,w,h,roi,mask)
 
@@ -185,7 +185,7 @@ class BaseDatasets:
 
             ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
             #  
-            l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask)
+            l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
             print("{},{},{},{},{}".format(l,x,y,w,h))
 
             y_add,x_add = self.Get_ROI_X2Y2_Padding(w,h)
