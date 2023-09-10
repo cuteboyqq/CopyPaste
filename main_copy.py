@@ -8,21 +8,26 @@ from task.lanemarking import LaneMarkingDataset
 def get_args_StopSign():
     import argparse
     parser = argparse.ArgumentParser()
+    ##   BDD100k datasets directory
     parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
-    # For StopSign parameter
+    ##   Stop sign ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',\
-                        default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/datasets/stop_sign_new_v8787/roi")
+                        default="./datasets/ROI/stopsign/roi")
     
     parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
-                        default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/datasets/stop_sign_new_v8787/mask")
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/generate_images")
+                        default="./datasets/ROI/stopsign/mask")
+    ## Save parameters
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./generate_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save stopsign fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save stopsign yolo.txt')
     parser.add_argument('-showimg','--show-img',type=bool,default=False,help='show images result')
     parser.add_argument('-showroi','--show-roi',type=bool,default=False,help='show roi result')
+
+
+    ## Others setting
     parser.add_argument('-numimg','--num-img',type=int,default=1000,help='number of generate fake landmark images')
     parser.add_argument('-roimaxwidth','--roi-maxwidth',type=int,default=400,help='max width of stop sign ROI')
     parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='enable(True)/disable(False) mask method to generate landmark or not')
@@ -40,17 +45,26 @@ def get_args_LaneMarking():
     
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
+    ##   BDD100k datasets directory
+
+    # image is from previous generate stop sign images
     parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/generate_images/images")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/generate_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
-    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/roi")
+    
+    ##   lanemarking  ROI/Mask directory
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="./datasets/ROI/lanemarking/roi")
 
-    parser.add_argument('-maskdir','--mask-dir',help='roi mask dir',default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/mask")
+    parser.add_argument('-maskdir','--mask-dir',help='roi mask dir',default="./datasets/ROI/lanemarking/mask")
+
+
     
     parser.add_argument('-drilabeldirtrain','--dri-labeldirtrain',help='drivable label dir fo train',default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/masks/train")
     parser.add_argument('-linelabeldir','--line-labeldir',help='line label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/lane/masks/train")
     
+
+    ## Save parameters
     parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images")
 
 
