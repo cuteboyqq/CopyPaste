@@ -18,7 +18,7 @@ class BaseDatasets:
         self.dri_dir = args.dri_dir
         self.label_dir = args.label_dir
         self.img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
-        self.vanish_y = 300 ##  default vanish y
+        #self.vanish_y = 300 ##  default vanish y
 
         ## other setting
         self.carhood_ratio = args.carhood_ratio
@@ -35,7 +35,25 @@ class BaseDatasets:
             label_file = self.im_name +  ".txt"
             label_path = os.path.join(self.label_dir,label_file)
 
+            self.im = cv2.imread(self.im_path)
+            self.dri = cv2.imread(dri_path)
+            im_h = self.im.shape[0]
+            vanish_y = 0
+            x = int(self.im.shape[1]/2.0)
+            while(self.dri[vanish_y][x][0]==0):
+                if vanish_y+1< (im_h-1):
+                    vanish_y+=1
+                else:
+                    break
+
+            if vanish_y>= int(im_h * self.carhood_ratio):
+                vanish_y = int(im_h * self.carhood_ratio) - 100
+                
         
+            self.vanish_y = vanish_y
+
+
+
             print("i = {}".format(i))
             self.data_info.append([self.im_path,     dri_path,    self.vanish_y,   label_path])
             cnt+=1

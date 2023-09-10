@@ -10,7 +10,7 @@ class PedestrainDataset(BaseDatasets):
     def __init__(self):
         self.label = 11 #Stop sign label
         self.method = "mask"
-    
+        
 
     def Get_ROI_Label(self):
     

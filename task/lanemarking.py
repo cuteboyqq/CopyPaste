@@ -16,23 +16,23 @@ class LaneMarkingDataset(BaseDatasets):
     
         return self.label
 
-    def Get_Update_Vanish_Y(self):
-        im_h = self.im.shape[0]
-        vanish_y = 0
-        x = int(self.im.shape[1]/2.0)
-        while(self.dri[vanish_y][x][0]==0):
-            if vanish_y+1< (im_h-1):
-                vanish_y+=1
-            else:
-                break
+    # def Get_Update_Vanish_Y(self):
+    #     im_h = self.im.shape[0]
+    #     vanish_y = 0
+    #     x = int(self.im.shape[1]/2.0)
+    #     while(self.dri[vanish_y][x][0]==0):
+    #         if vanish_y+1< (im_h-1):
+    #             vanish_y+=1
+    #         else:
+    #             break
 
-        if vanish_y>= int(im_h * self.carhood_ratio):
-            vanish_y = int(im_h * self.carhood_ratio) - 100
+    #     if vanish_y>= int(im_h * self.carhood_ratio):
+    #         vanish_y = int(im_h * self.carhood_ratio) - 100
             
       
-        self.vanish_y = vanish_y
+    #     self.vanish_y = vanish_y
 
-        return vanish_y
+    #     return vanish_y
 
 
     def Get_Possible_ROI_Position_Area(self):
@@ -44,7 +44,7 @@ class LaneMarkingDataset(BaseDatasets):
 
 
     def Get_ROI_XY_In_Image(self):
-        self.vanish_y = self.Get_Update_Vanish_Y()
+        #self.vanish_y = self.Get_Update_Vanish_Y()
         print("self.vanish_y:{}".format(self.vanish_y))
         #input()
         mask = self.Get_Possible_ROI_Position_Area()
@@ -118,6 +118,10 @@ class LaneMarkingDataset(BaseDatasets):
             self.roi_h = int(self.im.shape[0] * 0.75)
             ratio = float(self.roi_h/roi.shape[0])
             self.roi_w = int(roi.shape[1]*ratio)
+        elif self.roi_h<=0:
+            self.roi_h = 20
+            self.roi_w = 80
+            
 
         print("self.roi_w:{}".format(self.roi_w))
         print("self.roi_h:{}".format(self.roi_h))

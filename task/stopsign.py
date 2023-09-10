@@ -21,6 +21,21 @@ class StopSignDataset(BaseDatasets):
         mask = np.zeros(self.im.shape, dtype=np.uint8)
         mask[self.dri>0]=255
         mask[self.dri==0]=0
+
+        ## not overlapped with ither bounding box
+        if os.path.exists(self.label_path):
+            with open(self.label_path,'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    line_list = line.split(" ")
+                    label = line_list[0]
+                    x = int(float(line_list[1])*self.im.shape[1])
+                    y = int(float(line_list[2])*self.im.shape[0])
+                    w = int(float(line_list[3])*self.im.shape[1])
+                    h = int(float(line_list[4])*self.im.shape[0])
+                    
+                    mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = 255
+
         return mask
 
 
