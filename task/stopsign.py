@@ -29,12 +29,12 @@ class StopSignDataset(BaseDatasets):
         
         ## initial random (x,y)
         x = random.randint(0,self.im.shape[1]-1)
-        y = random.randint(0,self.im.shape[0]-1)
+        y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
 
         ## Stop should put at non-drivable area
         while(mask[y][x][0]!=0): # Exist while when (x,y) is in non-drivable area
             x = random.randint(0,self.im.shape[1]-1)
-            y = random.randint(0,self.im.shape[0]-1)
+            y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
 
         self.roi_x  = x
         self.roi_y  = y

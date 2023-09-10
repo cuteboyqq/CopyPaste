@@ -10,64 +10,40 @@ class BaseDatasets:
         
         self.args = args
 
-        self.label = 10 #Stop sign label
-        self.method = "mask"
-        
+        self.label = args.roi_label #Stop sign label
+        self.method = args.method
         
         # bdd100k datasets
         self.img_dir = args.img_dir
         self.dri_dir = args.dri_dir
         self.label_dir = args.label_dir
         self.img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
-        
+        self.vanish_y = 300 ##  default vanish y
 
-
+        ## other setting
+        self.carhood_ratio = args.carhood_ratio
+        self.num_img = args.num_img
         self.data_info = []
         cnt = 1
-        for i in range(10000):
+        for i in range(self.num_img+1):
             self.im_path = self.img_path_list[i]
             #self.im_path = im_path
             self.Parse_path()
             dri_file = self.im_name + ".png"
             dri_path = os.path.join(self.dri_dir,dri_file)
-            #print("dri_path:")
-            #print(dri_path)
-            
-            #cv2.imshow("dri",dri)
-            #cv2.waitKey(1000)
-            #cv2.destroyAllWindows()
-            
+                
             label_file = self.im_name +  ".txt"
             label_path = os.path.join(self.label_dir,label_file)
 
-            # vanish_y = 0
-            # get_vanish_y = False
-            # #print(dri.shape[0])
-            # #print(dri.shape[1])
-            # for j in range(dri.shape[0]):
-            #     for k in range(dri.shape[1]):
-            #         if dri[j][k][0]!=0 and get_vanish_y==False:
-            #             vanish_y = j
-            #             get_vanish_y = True
-
-            vanish_y = 360
-            # print(im_path)
-            # print(dri_path)
-            # print(im.shape)
-            # print(dri.shape)
-            # print(vanish_y)
-            # print(label_path)
-            # print("==================================================")
+        
             print("i = {}".format(i))
-            self.data_info.append([self.im_path,     dri_path,    vanish_y,   label_path])
+            self.data_info.append([self.im_path,     dri_path,    self.vanish_y,   label_path])
             cnt+=1
             
         # roi datasets
         self.roi_label = args.roi_label
         self.roi_dir = args.roi_dir
         self.mask_dir = args.mask_dir
-        
-
 
         # Save
         self.save_dir = args.save_dir
@@ -93,7 +69,7 @@ class BaseDatasets:
         # return (x,y)
         return NotImplementedError
 
-    def Get_ROI_WH_In_Image(self,roi,roi_mask,dri_path)):
+    def Get_ROI_WH_In_Image(self,roi,roi_mask,dri_path):
         # w = 50
         # h = 50
         # return (w,h)
@@ -122,8 +98,11 @@ class BaseDatasets:
         self.roi_mask_path = os.path.join(self.mask_dir,roi_file)
         roi_mask = cv2.imread(self.roi_mask_path)
 
-
         roi = cv2.imread(self.roi_path)
+        # cv2.imshow("msak",roi_mask)
+        # cv2.imshow("roi",roi)
+        # cv2.waitKey(1000)
+        # cv2.destroyAllWindows()
         return roi, roi_mask
 
     def Get_ROI_X2Y2_Padding(self,w,h):
@@ -193,8 +172,75 @@ class BaseDatasets:
             x = x_c
             y = y_c
             if os.path.exists(self.label_path):
+                
+
+                ## Save coptpasted image
+                if True:
+                    IS_FAILED=False
+                    if self.method=="both":
+                        choose = random.randint(1,2)
+                        if choose==1:
+                            self.method = "opencv"
+                        else:
+                            self.method = "mask"
+
+                    print("save image")
+                    if self.method == "opencv":
+                        print("opencv method~~")
+                        #input()
+                        center = (x,y)
+                        mask = 255 * np.ones(roi.shape, roi.dtype)
+                        print("roi.shape:{}".format(roi.shape))
+                        print("roi.dtype:{}".format(roi.dtype))
+                        try:
+                            output = cv2.seamlessClone(roi, self.im, mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
+                        except:
+                            IS_FAILED=True
+                            pass
+                        #return NotImplemented
+                    elif self.method == "mask":
+                        print("mask method~~")
+                        #input()
+                        ## ROI Bounding Box (x1,y1): left-top point, (x2,y2): down-right point 
+                        y1 = y - int(h/2.0)
+                        y2 = y + int(h/2.0) + y_add
+                        x1 = x - int(w/2.0) 
+                        x2 = x + int(w/2.0) + x_add
+                        print("y:{},x:{}".format(y,x))
+                        print("h:{} w:{}".format(h,w))
+                        img_roi = self.im[y1:y2,x1:x2]
+                        print("img_roi:")
+                        print(img_roi.shape)
+                        print("roi_mask:")
+                        print(roi_mask.shape)
+                        roi_tmp = np.zeros(roi.shape, dtype=np.uint8)
+
+                        
+                        ## processing stop sign ROI
+                        roi_tmp[roi_mask>30] = roi[roi_mask>30] ## Fill stop sign forground
+                        roi_tmp[roi_mask<=30] = img_roi[roi_mask<=30] ## Fill ROI background with image
+
+                        ## "Copypaste" processed ROI into image
+                        self.im[y1:y2,x1:x2] = roi_tmp
+                    
+                    ## Save image
+                    save_im_dir = os.path.join(self.save_dir,"images")
+                    os.makedirs(save_im_dir,exist_ok=True)
+                    img_file = self.im_path.split("/")[-1]
+                    save_img_path = os.path.join(save_im_dir,img_file)
+                    if IS_FAILED==False:
+                        if self.method == "opencv":
+                            print("save image")
+                            cv2.imwrite(save_img_path,output)
+                        else:
+                            print("mask method save image")
+                            cv2.imwrite(save_img_path,self.im)
+
+                    #return NotImplemented
+
+                    #return NotImplemented
                 ## Save corresponding yolo label.txt
-                if self.save_txt:
+                if self.save_txt and IS_FAILED==False:
                     print("save txt")
                     ## normalize xywh
                     x_s = str( int(float( (x) / self.im.shape[1] )*1000000)/1000000 ) 
@@ -228,53 +274,6 @@ class BaseDatasets:
                     f_new.write("\n")
                     f_new.close()
                     #return NotImplemented
-
-                ## Save coptpasted image
-                if True:
-                    print("save image")
-                    if self.method == "opencv":
-                        center = (x,y)
-                        output = cv2.seamlessClone(roi, self.im, roi_mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
-                        return NotImplemented
-                    elif self.method == "mask":
-                        ## ROI Bounding Box (x1,y1): left-top point, (x2,y2): down-right point 
-                        y1 = y - int(h/2.0)
-                        y2 = y + int(h/2.0) + y_add
-                        x1 = x - int(w/2.0) 
-                        x2 = x + int(w/2.0) + x_add
-                        print("y:{},x:{}".format(y,x))
-                        print("h:{} w:{}".format(h,w))
-                        img_roi = self.im[y1:y2,x1:x2]
-                        print("img_roi:")
-                        print(img_roi.shape)
-                        print("roi_mask:")
-                        print(roi_mask.shape)
-                        roi_tmp = np.zeros(roi.shape, dtype=np.uint8)
-
-                        ## processing stop sign ROI
-                        roi_tmp[roi_mask>20] = roi[roi_mask>20] ## Fill stop sign forground
-                        roi_tmp[roi_mask==0] = img_roi[roi_mask==0] ## Fill ROI background with image
-
-                        ## "Copypaste" processed ROI into image
-                        self.im[y1:y2,x1:x2] = roi_tmp
-                        
-                    ## Save image
-                    save_im_dir = os.path.join(self.save_dir,"images")
-                    os.makedirs(save_im_dir,exist_ok=True)
-                    img_file = self.im_path.split("/")[-1]
-                    save_img_path = os.path.join(save_im_dir,img_file)
-
-                    if self.method == "opencv":
-                        print("save image")
-                        cv2.imwrite(save_img_path,output)
-                    else:
-                        print("mask method save image")
-                        cv2.imwrite(save_img_path,self.im)
-
-                    #return NotImplemented
-
-                    #return NotImplemented
-
                 if self.show_img:
                     continue
                 if self.show_roi:
