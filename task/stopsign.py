@@ -34,7 +34,7 @@ class StopSignDataset(BaseDatasets):
                     w = int(float(line_list[3])*self.im.shape[1])
                     h = int(float(line_list[4])*self.im.shape[0])
                     
-                    mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = 255
+                    mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = (255,255,255)
 
         return mask
 

@@ -17,6 +17,7 @@ class BaseDatasets:
         self.img_dir = args.img_dir
         self.dri_dir = args.dri_dir
         self.label_dir = args.label_dir
+        #self.laneline_dir = args.laneline_dir
         self.img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
         #self.vanish_y = 300 ##  default vanish y
 
