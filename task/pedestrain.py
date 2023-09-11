@@ -21,6 +21,20 @@ class PedestrainDataset(BaseDatasets):
         mask = np.zeros(self.im.shape, dtype=np.uint8)
         mask[self.dri>0]=255
         mask[self.dri==0]=0
+
+        ## not overlapped with other bounding box
+        if os.path.exists(self.label_path):
+            with open(self.label_path,'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    line_list = line.split(" ")
+                    label = line_list[0]
+                    x = int(float(line_list[1])*self.im.shape[1])
+                    y = int(float(line_list[2])*self.im.shape[0])
+                    w = int(float(line_list[3])*self.im.shape[1])
+                    h = int(float(line_list[4])*self.im.shape[0])
+                    
+                    mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = (255,255,255)
         return mask
 
 
@@ -29,13 +43,13 @@ class PedestrainDataset(BaseDatasets):
         
         ## initial random (x,y)
         x = random.randint(0,self.im.shape[1]-1)
-        y = random.randint(self.vanish_y,self.im.shape[0]-1)
+        y = random.randint(0,int(self.im.shape[0]*self.carhood_ratio))
 
-        ## Stop should put at non-drivable area
+        ## Pedestrain put at non-drivable area
         cnt = 1
-        while(mask[y][x][0]==0): # Exist while when (x,y) is in drivable area
+        while(mask[y][x][0]!=0): # Exist while when (x,y) is not in drivable area
             x = random.randint(0,self.im.shape[1]-1)
-            y = random.randint(self.vanish_y - 50,self.im.shape[0]-1)
+            y = random.randint(0,int(self.im.shape[0]*self.carhood_ratio))
             cnt+=1
             if cnt==100:
                 break
@@ -94,8 +108,8 @@ class PedestrainDataset(BaseDatasets):
         print("y_c = {}".format(y_c))
 
 
-        if final_roi_h < 60:
-            y_c = random.randint(self.vanish_y,self.vanish_y + 100)
+        # if final_roi_h < 60:
+        #     y_c = random.randint(self.vanish_y,self.vanish_y + 100)
 
         ## left boundary
         if x_c-int(final_roi_w/2.0)<=0:

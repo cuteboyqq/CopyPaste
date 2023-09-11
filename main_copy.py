@@ -10,9 +10,9 @@ from utils.config import get_args_StopSign,get_args_LaneMarking,get_args_Pedestr
 
 if __name__=="__main__":
 
-    STOPSIGN=False
-    LANEMARKING=False
-    SEQUENTIAL_COPYPASTE=False
+    STOPSIGN=True
+    LANEMARKING=True
+    SEQUENTIAL_COPYPASTE=True
     PEDESTRIAN=True
 
     if SEQUENTIAL_COPYPASTE:
@@ -24,9 +24,16 @@ if __name__=="__main__":
             args_lanemarking = get_args_LaneMarking()
             lanemarking = LaneMarkingDataset(args_lanemarking)
             lanemarking.CopyPaste()
-
+        if PEDESTRIAN:
+            args_pedestrian = get_args_Pedestrain()
+            pedestrain = PedestrainDataset(args_pedestrian)
+            pedestrain.CopyPasteSimple()
+    # if LANEMARKING:
+    #         args_lanemarking = get_args_LaneMarking()
+    #         lanemarking = LaneMarkingDataset(args_lanemarking)
+    #         lanemarking.CopyPaste()
     
-    if PEDESTRIAN:
-        args_pedestrian = get_args_Pedestrain()
-        pedestrain = PedestrainDataset(args_pedestrian)
-        pedestrain.CopyPasteSimple()
+    # if PEDESTRIAN:
+    #     args_pedestrian = get_args_Pedestrain()
+    #     pedestrain = PedestrainDataset(args_pedestrian)
+    #     pedestrain.CopyPasteSimple()

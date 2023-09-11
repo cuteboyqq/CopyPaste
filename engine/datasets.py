@@ -187,126 +187,148 @@ class BaseDatasets:
             self.dri = cv2.imread(self.dri_path)
 
             ## Get stop sign ROI by random
-            roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+            if self.num_roi == 1:
+                roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+            else:
+                roi_roimask = []
+                for i in range(self.num_roi):
+                    roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+                    roi_roimask.append([roi, roi_mask])
+            
+            if self.num_roi == 1:
+                COPY_ORI_TXT_DONE=False
+                COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,COPY_ORI_TXT_DONE)
+            else:
+                COPY_ORI_TXT_DONE = False
+                for i in range(len(roi_roimask)):
+                    roi = roi_roimask[i][0]
+                    roi_mask = roi_roimask[i][1]
+                    COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,COPY_ORI_TXT_DONE)
+                    
+
+    def CopyPasteOneROI(self,roi,roi_mask,COPY_ORI_TXT_DONE):
+        ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
+        #  
+        l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
+        print("{},{},{},{},{}".format(l,x,y,w,h))
+
+        y_add,x_add = self.Get_ROI_X2Y2_Padding(w,h)
+        x_c,y_c = self.Check_And_Update_ROI_XY_In_Image_Boundary(x,y,w,h,x_add,y_add)
+        x = x_c
+        y = y_c
+        if os.path.exists(self.label_path):
             
 
-            ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
-            #  
-            l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
-            print("{},{},{},{},{}".format(l,x,y,w,h))
+            ## Save coptpasted image
+            if True:
+                IS_FAILED=False
+                if self.method=="both":
+                    choose = random.randint(1,2)
+                    if choose==1:
+                        self.method = "opencv"
+                    else:
+                        self.method = "mask"
 
-            y_add,x_add = self.Get_ROI_X2Y2_Padding(w,h)
-            x_c,y_c = self.Check_And_Update_ROI_XY_In_Image_Boundary(x,y,w,h,x_add,y_add)
-            x = x_c
-            y = y_c
-            if os.path.exists(self.label_path):
-                
+                print("save image")
+                if self.method == "opencv":
+                    print("opencv method~~")
+                    #input()
+                    center = (x,y)
+                    mask = 255 * np.ones(roi.shape, roi.dtype)
+                    print("roi.shape:{}".format(roi.shape))
+                    print("roi.dtype:{}".format(roi.dtype))
+                    try:
+                        output = cv2.seamlessClone(roi, self.im, mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
+                    except:
+                        IS_FAILED=True
+                        pass
+                    #return NotImplemented
+                elif self.method == "mask":
+                    print("mask method~~")
+                    #input()
+                    ## ROI Bounding Box (x1,y1): left-top point, (x2,y2): down-right point 
+                    y1 = y - int(h/2.0)
+                    y2 = y + int(h/2.0) + y_add
+                    x1 = x - int(w/2.0) 
+                    x2 = x + int(w/2.0) + x_add
+                    print("y:{},x:{}".format(y,x))
+                    print("h:{} w:{}".format(h,w))
+                    img_roi = self.im[y1:y2,x1:x2]
+                    print("img_roi:")
+                    print(img_roi.shape)
+                    print("roi_mask:")
+                    print(roi_mask.shape)
+                    roi_tmp = np.zeros(roi.shape, dtype=np.uint8)
 
-                ## Save coptpasted image
-                if True:
-                    IS_FAILED=False
-                    if self.method=="both":
-                        choose = random.randint(1,2)
-                        if choose==1:
-                            self.method = "opencv"
-                        else:
-                            self.method = "mask"
-
-                    print("save image")
-                    if self.method == "opencv":
-                        print("opencv method~~")
-                        #input()
-                        center = (x,y)
-                        mask = 255 * np.ones(roi.shape, roi.dtype)
-                        print("roi.shape:{}".format(roi.shape))
-                        print("roi.dtype:{}".format(roi.dtype))
-                        try:
-                            output = cv2.seamlessClone(roi, self.im, mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
-                        except:
-                            IS_FAILED=True
-                            pass
-                        #return NotImplemented
-                    elif self.method == "mask":
-                        print("mask method~~")
-                        #input()
-                        ## ROI Bounding Box (x1,y1): left-top point, (x2,y2): down-right point 
-                        y1 = y - int(h/2.0)
-                        y2 = y + int(h/2.0) + y_add
-                        x1 = x - int(w/2.0) 
-                        x2 = x + int(w/2.0) + x_add
-                        print("y:{},x:{}".format(y,x))
-                        print("h:{} w:{}".format(h,w))
-                        img_roi = self.im[y1:y2,x1:x2]
-                        print("img_roi:")
-                        print(img_roi.shape)
-                        print("roi_mask:")
-                        print(roi_mask.shape)
-                        roi_tmp = np.zeros(roi.shape, dtype=np.uint8)
-
-                        
-                        ## processing stop sign ROI
-                        roi_tmp[roi_mask>30] = roi[roi_mask>30] ## Fill stop sign forground
-                        roi_tmp[roi_mask<=30] = img_roi[roi_mask<=30] ## Fill ROI background with image
-
-                        ## "Copypaste" processed ROI into image
-                        self.im[y1:y2,x1:x2] = roi_tmp
                     
-                    ## Save image
-                    save_im_dir = os.path.join(self.save_dir,"images")
-                    os.makedirs(save_im_dir,exist_ok=True)
-                    img_file = self.im_path.split("/")[-1]
-                    save_img_path = os.path.join(save_im_dir,img_file)
-                    if IS_FAILED==False:
-                        if self.method == "opencv":
-                            print("save image")
-                            cv2.imwrite(save_img_path,output)
-                        else:
-                            print("mask method save image")
-                            cv2.imwrite(save_img_path,self.im)
+                    ## processing stop sign ROI
+                    roi_tmp[roi_mask>30] = roi[roi_mask>30] ## Fill stop sign forground
+                    roi_tmp[roi_mask<=30] = img_roi[roi_mask<=30] ## Fill ROI background with image
 
-                    #return NotImplemented
+                    ## "Copypaste" processed ROI into image
+                    self.im[y1:y2,x1:x2] = roi_tmp
+                
+                ## Save image
+                save_im_dir = os.path.join(self.save_dir,"images")
+                os.makedirs(save_im_dir,exist_ok=True)
+                img_file = self.im_path.split("/")[-1]
+                save_img_path = os.path.join(save_im_dir,img_file)
+                if IS_FAILED==False:
+                    if self.method == "opencv":
+                        print("save image")
+                        cv2.imwrite(save_img_path,output)
+                    else:
+                        print("mask method save image")
+                        cv2.imwrite(save_img_path,self.im)
 
-                    #return NotImplemented
-                ## Save corresponding yolo label.txt
-                if self.save_txt and IS_FAILED==False:
-                    print("save txt")
-                    ## normalize xywh
-                    x_s = str( int(float( (x) / self.im.shape[1] )*1000000)/1000000 ) 
-                    y_s = str( int(float( (y) / self.im.shape[0] )*1000000)/1000000 )
-                    w_s = str( int((roi.shape[1]/self.im.shape[1])*1000000)/1000000)
-                    h_s = str( int((roi.shape[0]/self.im.shape[0])*1000000)/1000000)
-                    add_line = str(l) + " " + x_s + " " + y_s + " " + w_s + " " + h_s
+                #return NotImplemented
 
-                    ## Get corresponding label path
-                    img_file = self.im_path.split("/")[-1]
-                    img_filename = img_file.split(".")[0]
+                #return NotImplemented
+            ## Save corresponding yolo label.txt
+            if self.save_txt and IS_FAILED==False:
+                print("save txt")
+                ## normalize xywh
+                x_s = str( int(float( (x) / self.im.shape[1] )*1000000)/1000000 ) 
+                y_s = str( int(float( (y) / self.im.shape[0] )*1000000)/1000000 )
+                w_s = str( int((roi.shape[1]/self.im.shape[1])*1000000)/1000000)
+                h_s = str( int((roi.shape[0]/self.im.shape[0])*1000000)/1000000)
+                add_line = str(l) + " " + x_s + " " + y_s + " " + w_s + " " + h_s
 
-                    label_file = img_filename+".txt"
-                    save_label_dir = os.path.join(self.save_dir,"labels")
-                    os.makedirs(save_label_dir,exist_ok=True)
-                    save_label_path = os.path.join(save_label_dir,label_file)
+                ## Get corresponding label path
+                img_file = self.im_path.split("/")[-1]
+                img_filename = img_file.split(".")[0]
 
-                    ## open save label.txt
-                    f_new=open(save_label_path,"a")
+                label_file = img_filename+".txt"
+                save_label_dir = os.path.join(self.save_dir,"labels")
+                os.makedirs(save_label_dir,exist_ok=True)
+                save_label_path = os.path.join(save_label_dir,label_file)
 
+                ## open save label.txt
+                f_new=open(save_label_path,"a")
+
+                if COPY_ORI_TXT_DONE==False:
                     ## Copy original label.txt into save label.txt
                     with open(self.label_path,"r") as f:
                         lines=f.readlines()
                         for line in lines:
                             f_new.write(line)
-                        
-                    f.close()
                     
-                    ## Add new stop sign label lxxywh into save label.txt
-                    f_new.write(add_line)
-                    f_new.write("\n")
-                    f_new.close()
-                    #return NotImplemented
-                if self.show_img:
-                    continue
-                if self.show_roi:
-                    continue
-    
+                    COPY_ORI_TXT_DONE=True
+                    
+                    f.close()
+                
+                ## Add new stop sign label lxxywh into save label.txt
+                f_new.write(add_line)
+                f_new.write("\n")
+                f_new.close()
+                #return NotImplemented
+            if self.show_img:
+                return NotImplemented
+            if self.show_roi:
+                return NotImplemented
+
+            return COPY_ORI_TXT_DONE
+
     def CopyPasteSimple(self):
         for i in range(len(self.data_info)):
             ## Get image information

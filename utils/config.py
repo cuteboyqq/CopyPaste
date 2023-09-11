@@ -26,7 +26,7 @@ def get_args_StopSign():
 
 
     ## Others setting
-    parser.add_argument('-numimg','--num-img',type=int,default=1000,help='number of generate fake landmark images')
+    parser.add_argument('-numimg','--num-img',type=int,default=200,help='number of generate fake landmark images')
     parser.add_argument('-roimaxwidth','--roi-maxwidth',type=int,default=400,help='max width of stop sign ROI')
     parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='enable(True)/disable(False) mask method to generate landmark or not')
     parser.add_argument('-roimaskdirstopsign','--roi-maskdirstopsign',help='roi mask dir',\
@@ -35,6 +35,7 @@ def get_args_StopSign():
     parser.add_argument('-roilabel','--roi-label',type=int,default=10,help='stop sign label = 10')
     parser.add_argument('-method','--method',type=str,default="mask",help='use mask/opencv/both method to generate landmark')
     parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
+    parser.add_argument('-numroi','--num-roi',type=int,default=4,help='number of pedestrain roi in image')
     return parser.parse_args() 
 
 
@@ -70,7 +71,7 @@ def get_args_LaneMarking():
     #parser.add_argument('-savecolormap','--save-colormap',action='store_true',help='save generate semantic segment colormaps')
     #parser.add_argument('-savemask','--save-mask',action='store_true',help='save generate semantic segment train masks')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save lanemarking yolo.txt')
-    parser.add_argument('-numimg','--num-img',type=int,default=900,help='number of generate fake landmark images')
+    parser.add_argument('-numimg','--num-img',type=int,default=180,help='number of generate fake landmark images')
     parser.add_argument('-useopencvratio','--use-opencvratio',type=float,default=0.50,help='ratio of using opencv method to generate landmark images')
     parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='use mask method to generate landmark or not')
     parser.add_argument('-show','--show',action='store_true',help='show images result')
@@ -82,6 +83,8 @@ def get_args_LaneMarking():
     parser.add_argument('-showimg','--show-img',type=bool,default=False,help='show images result')
 
     parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
+
+    parser.add_argument('-numroi','--num-roi',type=int,default=1,help='number of pedestrain roi in image')
     return parser.parse_args()
 
 
@@ -89,8 +92,8 @@ def get_args_Pedestrain():
     import argparse
     parser = argparse.ArgumentParser()
     ##   BDD100k datasets directory
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images/images")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
     ##   Pedestrian ROI/Mask directory
@@ -108,11 +111,11 @@ def get_args_Pedestrain():
 
 
     ## Others setting
-    parser.add_argument('-numimg','--num-img',type=int,default=1000,help='number of generate fake pedestrain images')
-    parser.add_argument('-roilabel','--roi-label',type=int,default=12,help='pedestrain label = 12')
+    parser.add_argument('-numimg','--num-img',type=int,default=150,help='number of generate fake pedestrain images')
+    parser.add_argument('-roilabel','--roi-label',type=int,default=0,help='pedestrain label = 0')
     parser.add_argument('-method','--method',type=str,default="mask",help='use mask/opencv/both method to generate pedestrain')
     parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
-    parser.add_argument('-numroi','--num-roi',type=int,default=10,help='number of pedestrain roi in image')
+    parser.add_argument('-numroi','--num-roi',type=int,default=12,help='number of pedestrain roi in image')
     return parser.parse_args()
 
 
