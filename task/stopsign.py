@@ -22,7 +22,7 @@ class StopSignDataset(BaseDatasets):
         mask[self.dri>0]=255
         mask[self.dri==0]=0
 
-        ## not overlapped with ither bounding box
+        ## not overlapped with other bounding box
         if os.path.exists(self.label_path):
             with open(self.label_path,'r') as f:
                 lines = f.readlines()
@@ -47,10 +47,13 @@ class StopSignDataset(BaseDatasets):
         y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
 
         ## Stop should put at non-drivable area
+        cnt = 1
         while(mask[y][x][0]!=0): # Exist while when (x,y) is in non-drivable area
             x = random.randint(0,self.im.shape[1]-1)
             y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
-
+            cnt+=1
+            if cnt==100:
+                break
         self.roi_x  = x
         self.roi_y  = y
         return (x,y)
