@@ -127,7 +127,11 @@ class LaneMarkingDataset(BaseDatasets):
         print("self.roi_h:{}".format(self.roi_h))
 
         self.roi_resized = cv2.resize(roi,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
-        self.roi_mask = cv2.resize(roi_mask,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
+
+        if roi_mask is not None:
+            self.roi_mask = cv2.resize(roi_mask,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
+        else:
+            self.roi_mask = None
 
         print(self.roi_resized.shape)
         print(self.roi_mask.shape )

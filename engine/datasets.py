@@ -63,6 +63,8 @@ class BaseDatasets:
         self.roi_label = args.roi_label
         self.roi_dir = args.roi_dir
         self.mask_dir = args.mask_dir
+        self.num_roi = args.num_roi
+        #self.use_mask = args.use_mask
 
         # Save
         self.save_dir = args.save_dir
@@ -112,10 +114,16 @@ class BaseDatasets:
         roi_index = random.randint(0,len(roi_path_list)-1)
         self.roi_path = roi_path_list[roi_index]
 
+        roi_mask = None
         ## Get corresponding roi mask
         roi_file = self.roi_path.split("/")[-1]
         self.roi_mask_path = os.path.join(self.mask_dir,roi_file)
-        roi_mask = cv2.imread(self.roi_mask_path)
+
+        # check if roi mask exists
+        if os.path.exists(self.roi_mask_path):
+            roi_mask = cv2.imread(self.roi_mask_path)
+        else:
+            roi_mask = None
 
         roi = cv2.imread(self.roi_path)
         # cv2.imshow("msak",roi_mask)
@@ -180,6 +188,7 @@ class BaseDatasets:
 
             ## Get stop sign ROI by random
             roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+            
 
             ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
             #  
@@ -297,7 +306,105 @@ class BaseDatasets:
                     continue
                 if self.show_roi:
                     continue
-
-            
-
     
+    def CopyPasteSimple(self):
+        for i in range(len(self.data_info)):
+            ## Get image information
+            self.im_path, self.dri_path, self.vanish_y, self.label_path = self.data_info[i]
+
+            self.im = cv2.imread(self.im_path)
+            self.dri = cv2.imread(self.dri_path)
+
+            ## Get stop sign ROI by random
+            if self.num_roi == 1:
+                roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+            else:
+                roi_roimask = []
+                for i in range(self.num_roi):
+                    roi,roi_mask = self.Get_Random_ROI_And_ROIMask()
+                    roi_roimask.append([roi, roi_mask])
+
+            ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
+            #
+            COPY_ORI_TXT_DONE = False
+            for i in range(len(roi_roimask)):
+
+                roi = roi_roimask[i][0]
+                roi_mask = roi_roimask[i][1]
+
+                l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
+                print("{},{},{},{},{}".format(l,x,y,w,h))
+
+                y_add,x_add = self.Get_ROI_X2Y2_Padding(w,h)
+                x_c,y_c = self.Check_And_Update_ROI_XY_In_Image_Boundary(x,y,w,h,x_add,y_add)
+                x = x_c
+                y = y_c
+                IS_FAILED = False
+                if os.path.exists(self.label_path):
+                    ## ROI Bounding Box (x1,y1): left-top point, (x2,y2): down-right point 
+                    y1 = y - int(h/2.0)
+                    y2 = y + int(h/2.0) + y_add
+                    x1 = x - int(w/2.0) 
+                    x2 = x + int(w/2.0) + x_add
+                    print("y:{},x:{}".format(y,x))
+                    print("h:{} w:{}".format(h,w))
+
+                    try:
+                        ## "Copypaste" processed ROI into image
+                        self.im[y1:y2,x1:x2] = roi
+                    except:
+                        IS_FAILED=True
+                        pass
+                    
+                    ## Save image
+                    if IS_FAILED==False:
+                        save_im_dir = os.path.join(self.save_dir,"images")
+                        os.makedirs(save_im_dir,exist_ok=True)
+                        img_file = self.im_path.split("/")[-1]
+                        save_img_path = os.path.join(save_im_dir,img_file)
+                    
+                        print("save image")
+                        cv2.imwrite(save_img_path,self.im)
+                    
+
+                    
+                    ## Save corresponding yolo label.txt
+                    if self.save_txt and IS_FAILED==False:
+                        print("save txt")
+                        ## normalize xywh
+                        x_s = str( int(float( (x) / self.im.shape[1] )*1000000)/1000000 ) 
+                        y_s = str( int(float( (y) / self.im.shape[0] )*1000000)/1000000 )
+                        w_s = str( int((roi.shape[1]/self.im.shape[1])*1000000)/1000000)
+                        h_s = str( int((roi.shape[0]/self.im.shape[0])*1000000)/1000000)
+                        add_line = str(l) + " " + x_s + " " + y_s + " " + w_s + " " + h_s
+
+                        ## Get corresponding label path
+                        img_file = self.im_path.split("/")[-1]
+                        img_filename = img_file.split(".")[0]
+
+                        label_file = img_filename+".txt"
+                        save_label_dir = os.path.join(self.save_dir,"labels")
+                        os.makedirs(save_label_dir,exist_ok=True)
+                        save_label_path = os.path.join(save_label_dir,label_file)
+
+                        ## open save label.txt
+                        f_new=open(save_label_path,"a")
+
+                        ## Copy original label.txt into save label.txt
+                        if COPY_ORI_TXT_DONE==False:
+                            with open(self.label_path,"r") as f:
+                                lines=f.readlines()
+                                for line in lines:
+                                    f_new.write(line)
+                            COPY_ORI_TXT_DONE=True
+                            f.close()
+                        
+                        ## Add new stop sign label lxxywh into save label.txt
+                        f_new.write(add_line)
+                        f_new.write("\n")
+                        f_new.close()
+                        #return NotImplemented
+                    if self.show_img:
+                        continue
+                    if self.show_roi:
+                        continue
