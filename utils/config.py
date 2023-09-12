@@ -18,7 +18,7 @@ def get_args_StopSign():
     parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
                         default="./datasets/ROI/stopsign/mask")
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./generate_images")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./runs/generate_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save stopsign fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save stopsign yolo.txt')
     parser.add_argument('-showimg','--show-img',type=bool,default=False,help='show images result')
@@ -26,7 +26,7 @@ def get_args_StopSign():
 
 
     ## Others setting
-    parser.add_argument('-numimg','--num-img',type=int,default=12000,help='number of generate fake landmark images')
+    parser.add_argument('-numimg','--num-img',type=int,default=21500,help='number of generate fake landmark images')
     #parser.add_argument('-roimaxwidth','--roi-maxwidth',type=int,default=12000,help='max width of stop sign ROI')
     #parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='enable(True)/disable(False) mask method to generate landmark or not')
     #parser.add_argument('-roimaskdirstopsign','--roi-maskdirstopsign',help='roi mask dir',\
@@ -47,8 +47,8 @@ def get_args_LaneMarking():
     ##   BDD100k datasets directory
 
     # image is from previous generate stop sign images
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/generate_images/images")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/generate_images/labels")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/generate_images/images")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/generate_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
     
@@ -64,14 +64,14 @@ def get_args_LaneMarking():
     
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./runs/lanemark_fake_images")
 
 
     parser.add_argument('-saveimg','--save-img',action='store_true',help='save landmark fake images')
     #parser.add_argument('-savecolormap','--save-colormap',action='store_true',help='save generate semantic segment colormaps')
     #parser.add_argument('-savemask','--save-mask',action='store_true',help='save generate semantic segment train masks')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save lanemarking yolo.txt')
-    parser.add_argument('-numimg','--num-img',type=int,default=11000,help='number of generate fake landmark images')
+    parser.add_argument('-numimg','--num-img',type=int,default=21000,help='number of generate fake landmark images')
     parser.add_argument('-useopencvratio','--use-opencvratio',type=float,default=0.50,help='ratio of using opencv method to generate landmark images')
     parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='use mask method to generate landmark or not')
     parser.add_argument('-show','--show',action='store_true',help='show images result')
@@ -92,8 +92,8 @@ def get_args_Pedestrain():
     import argparse
     parser = argparse.ArgumentParser()
     ##   BDD100k datasets directory
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images/images")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/lanemark_fake_images/labels")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/lanemark_fake_images/images")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/lanemark_fake_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
     ##   Pedestrian ROI/Mask directory
@@ -103,7 +103,7 @@ def get_args_Pedestrain():
     parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
                         default="./datasets/ROI/pedestrain/mask")
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./generate_pedestrain_images")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="./runs/generate_pedestrain_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     parser.add_argument('-showimg','--show-img',type=bool,default=False,help='show images result')
@@ -111,7 +111,7 @@ def get_args_Pedestrain():
 
 
     ## Others setting
-    parser.add_argument('-numimg','--num-img',type=int,default=10000,help='number of generate fake pedestrain images')
+    parser.add_argument('-numimg','--num-img',type=int,default=19999,help='number of generate fake pedestrain images')
     parser.add_argument('-roilabel','--roi-label',type=int,default=0,help='pedestrain label = 0')
     parser.add_argument('-method','--method',type=str,default="mask",help='use mask/opencv/both method to generate pedestrain')
     parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')

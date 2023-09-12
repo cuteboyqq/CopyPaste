@@ -211,7 +211,8 @@ class BaseDatasets:
         #  
         l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
         print("{},{},{},{},{}".format(l,x,y,w,h))
-
+        print("roi:{}".format(roi.shape))
+        print("roi_mask:{}".format(roi_mask.shape))
         y_add,x_add = self.Get_ROI_X2Y2_Padding(w,h)
         x_c,y_c = self.Check_And_Update_ROI_XY_In_Image_Boundary(x,y,w,h,x_add,y_add)
         x = x_c
