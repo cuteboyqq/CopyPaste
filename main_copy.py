@@ -13,7 +13,7 @@ if __name__=="__main__":
     STOPSIGN=True
     LANEMARKING=True
     SEQUENTIAL_COPYPASTE=True
-    PEDESTRIAN=True
+    PEDESTRIAN=False
 
     if SEQUENTIAL_COPYPASTE:
         if STOPSIGN:
