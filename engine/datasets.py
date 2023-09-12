@@ -164,12 +164,19 @@ class BaseDatasets:
 
         ## ceiling(Top) boundary
         if y_c-int(final_roi_h/2.0)<=0:
+            #print("case1 : y_c-int(final_roi_h/2.0)")
             y_c =  int(final_roi_h/2.0) + 1 + y_add
 
         ## floor(Down) boundary
         if y_c+int(final_roi_h/2.0)+y_add>=self.im.shape[0]:
+            #print("case2 : y_c+int(final_roi_h/2.0)+y_add>=self.im.shape[0]")
             y_c = self.im.shape[0]-(int(final_roi_h/2.0)+y_add+1)
-            
+        
+        ## If still not OK, set the y_c to center....
+        if y_c-int(final_roi_h/2.0)<=0:
+            print("case3 : y_c-int(final_roi_h/2.0)<=0")
+            y_c = int(final_roi_h/2.0)
+
         print("after update x_c,y_c")
         print("x_c = {}".format(x_c))
         print("y_c = {}".format(y_c))
