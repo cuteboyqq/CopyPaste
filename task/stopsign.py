@@ -68,16 +68,26 @@ class StopSignDataset(BaseDatasets):
             self.roi_w = int(roi.shape[1]*float(random.randint(5,20)*0.1))
             self.roi_h = int(roi.shape[0]*(self.roi_w/roi.shape[1]))
         
-        ## filter too large size of stop sign
+        ## check if roi w is too large
         if self.roi_w > 250:
             roi_w_pre = self.roi_w
             self.roi_w = 250
             self.roi_h = int(self.roi_h * float(250/roi_w_pre))
-        elif self.roi_h > 250:
+            print("case 1 : self.roi_w > 250")
+            print("after correct")
+            print("self.roi_w:{}".format(self.roi_w))
+            print("self.roi_h:{}".format(self.roi_h))
+        
+        ## check if roi h is too large 
+        if self.roi_h > 250:
             roi_h_pre = self.roi_h
             self.roi_h = 250
             self.roi_w = int(self.roi_w * float(250/roi_h_pre))
-
+            print("case 2 : self.roi_h > 250")
+            print("after correct")
+            print("self.roi_w:{}".format(self.roi_w))
+            print("self.roi_h:{}".format(self.roi_h))
+            
         self.roi_resized = cv2.resize(roi,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
 
         if roi_mask is not None:
