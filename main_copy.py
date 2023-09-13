@@ -10,10 +10,11 @@ from utils.config import get_args_StopSign,get_args_LaneMarking,get_args_Pedestr
 
 if __name__=="__main__":
 
-    STOPSIGN=False
-    LANEMARKING=True
     SEQUENTIAL_COPYPASTE=True
-    PEDESTRIAN=False
+
+    STOPSIGN=True
+    LANEMARKING=True
+    PEDESTRIAN=True
 
     if SEQUENTIAL_COPYPASTE:
         if STOPSIGN:
