@@ -31,14 +31,14 @@ if KEEP_TRAFFIC_SIGN:
     LaneMarking_label = 11 
     Pedestrian_label = 0
     IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/train"
-    LABEL_DIR = "/home/ali/Projects/datasets/bdd100k_data/labels/detection/train"
+    LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train"
 
 else:
     StopSign_label = 9
     LaneMarking_label = 10 
     Pedestrian_label = 0
     IMAGE_DIR = "/home/ali/Projects/datasets/bdd100k_data/images/100k/train"
-    LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train"
+    LABEL_DIR = "/home/ali/Projects/datasets/bdd100k_data/labels/detection/train"
 
 def get_args_StopSign():
     import argparse

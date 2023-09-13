@@ -114,8 +114,8 @@ class LaneMarkingDataset(BaseDatasets):
         self.roi_h = int(roi.shape[0]*ratio)
         
         ##Check roi_w, roi_h
-        if self.roi_h >= int(self.im.shape[0] * 0.75):
-            self.roi_h = int(self.im.shape[0] * 0.75)
+        if self.roi_h >= int(self.im.shape[0] * 0.30):
+            self.roi_h = int(self.im.shape[0] * 0.30)
             ratio = float(self.roi_h/roi.shape[0])
             self.roi_w = int(roi.shape[1]*ratio)
         elif self.roi_h<=0:
