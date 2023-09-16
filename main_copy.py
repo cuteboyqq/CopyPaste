@@ -12,7 +12,7 @@ if __name__=="__main__":
 
     SEQUENTIAL_COPYPASTE=True
 
-    STOPSIGN=False
+    STOPSIGN=True
     LANEMARKING=True
     PEDESTRIAN=True
 
@@ -28,7 +28,7 @@ if __name__=="__main__":
         if PEDESTRIAN:
             args_pedestrian = get_args_Pedestrain()
             pedestrain = PedestrainDataset(args_pedestrian)
-            pedestrain.CopyPasteSimple()
+            pedestrain.CopyPaste()
     # if LANEMARKING:
     #         args_lanemarking = get_args_LaneMarking()
     #         lanemarking = LaneMarkingDataset(args_lanemarking)

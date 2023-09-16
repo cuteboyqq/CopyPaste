@@ -6,8 +6,8 @@ import numpy as np
 ## Setting here is more convienent than setting on the default of arguments.....
 
 ## Generate Number of images
-StopSign_num = 21000
-LnaeMarking_num = 20500
+StopSign_num = 22000
+LnaeMarking_num = 21000
 Pedestrian_num = 19999
 
 ## label settings
@@ -32,6 +32,7 @@ if KEEP_TRAFFIC_SIGN:
     Pedestrian_label = 0
     IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/train"
     LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train"
+    DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train"
 
 else:
     StopSign_label = 9
@@ -47,7 +48,7 @@ def get_args_StopSign():
     parser.add_argument('-imgdir','--img-dir',help='image dir',default=IMAGE_DIR)
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default=LABEL_DIR)
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
-                        default="/home/ali/Projects/datasets/bdd100k_data/labels/drivable/colormaps/train")
+                        default=DRI_DIR)
     ##   Stop sign ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',\
                         default="./datasets/ROI/stopsign/roi")
@@ -65,6 +66,7 @@ def get_args_StopSign():
     ## Others setting
     parser.add_argument('-numimg','--num-img',type=int,default=StopSign_num,help='number of generate fake landmark images')
     parser.add_argument('-roith','--roi-th',type=int,default=100,help='roi w/h threshold')
+    parser.add_argument('-overlapth','--overlap-th',type=float,default=0.01,help='roi IOU threshold')
     #parser.add_argument('-roimaxwidth','--roi-maxwidth',type=int,default=12000,help='max width of stop sign ROI')
     #parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='enable(True)/disable(False) mask method to generate landmark or not')
     #parser.add_argument('-roimaskdirstopsign','--roi-maskdirstopsign',help='roi mask dir',\
@@ -74,7 +76,7 @@ def get_args_StopSign():
     ## stop sign label
     parser.add_argument('-roilabel','--roi-label',type=int,default=StopSign_label,help='stop sign label = 9')
     parser.add_argument('-method','--method',type=str,default="mask",help='use mask/opencv/both method to generate landmark')
-    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
+    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.90,help='carhood ratio')
     parser.add_argument('-numroi','--num-roi',type=int,default=4,help='number of pedestrain roi in image')
     return parser.parse_args() 
 
@@ -90,7 +92,7 @@ def get_args_LaneMarking():
     parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/generate_images/images")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/generate_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
-                        default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
+                        default=DRI_DIR)
     
     ##   lanemarking  ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',default="./datasets/ROI/lanemarking/roi")
@@ -113,6 +115,8 @@ def get_args_LaneMarking():
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save lanemarking yolo.txt')
     parser.add_argument('-numimg','--num-img',type=int,default=LnaeMarking_num,help='number of generate fake landmark images')
     parser.add_argument('-roith','--roi-th',type=int,default=100,help='roi w/h threshold')
+    parser.add_argument('-overlapth','--overlap-th',type=float,default=0.01,help='roi IOU threshold')
+
 
     parser.add_argument('-useopencvratio','--use-opencvratio',type=float,default=0.50,help='ratio of using opencv method to generate landmark images')
     parser.add_argument('-usemask','--use-mask',type=bool,default=True,help='use mask method to generate landmark or not')
@@ -125,7 +129,7 @@ def get_args_LaneMarking():
     parser.add_argument('-showroi','--show-roi',type=bool,default=False,help='show roi result')
     parser.add_argument('-showimg','--show-img',type=bool,default=False,help='show images result')
 
-    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
+    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.90,help='carhood ratio')
 
     parser.add_argument('-numroi','--num-roi',type=int,default=1,help='number of pedestrain roi in image')
     return parser.parse_args()
@@ -138,7 +142,7 @@ def get_args_Pedestrain():
     parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/lanemark_fake_images/images")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/lanemark_fake_images/labels")
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
-                        default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
+                        default=DRI_DIR)
     ##   Pedestrian ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',\
                         default="./datasets/ROI/pedestrain/roi")
@@ -156,10 +160,11 @@ def get_args_Pedestrain():
     ## Others setting
     parser.add_argument('-numimg','--num-img',type=int,default=Pedestrian_num,help='number of generate fake pedestrain images')
     parser.add_argument('-roith','--roi-th',type=int,default=100,help='roi w/h threshold')
+    parser.add_argument('-overlapth','--overlap-th',type=float,default=0.01,help='roi IOU threshold')
 
     parser.add_argument('-roilabel','--roi-label',type=int,default=Pedestrian_label,help='pedestrain label = 0')
     parser.add_argument('-method','--method',type=str,default="mask",help='use mask/opencv/both method to generate pedestrain')
-    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.75,help='carhood ratio')
+    parser.add_argument('-carhoodratio','--carhood-ratio',type=float,default=0.90,help='carhood ratio')
     parser.add_argument('-numroi','--num-roi',type=int,default=12,help='number of pedestrain roi in image')
     return parser.parse_args()
 
@@ -180,6 +185,14 @@ def get_args_label():
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
     parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
+    return parser.parse_args()
+
+def get_args_roi():
+    import argparse
+    parser = argparse.ArgumentParser()
+    ##   BDD100k datasets directory
+    parser.add_argument('-datadir','--data-dir',help='data dir',default="/home/ali/Projects/datasets/nuimages/roi_train")
+    parser.add_argument('-savedir','--save-dir',help='save dir',default="./nuimages_roi")
     return parser.parse_args()
 
 

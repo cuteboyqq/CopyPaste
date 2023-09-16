@@ -94,11 +94,16 @@ class PedestrainDataset(BaseDatasets):
             if cnt>100:
                 roi_h_pre = self.roi_h
                 self.roi_h = 50
-                self.roi_w = int(self.roi_w * float(60/roi_h_pre))
+                self.roi_w = int(self.roi_w * float(60/roi_h_pre)) 
                 print("case 3: cnt>100")
                 print("after correct")
                 print("self.roi_w:{}".format(self.roi_w))
                 print("self.roi_h:{}".format(self.roi_h))
+            
+            if self.roi_h == 0 or self.roi_w == 0:
+                self.roi_h = roi.shape[0] if roi.shape[0]>0 else 30
+                self.roi_w = roi.shape[1] if roi.shape[1]>0 else 10
+
 
             xywh_stop_sign = [self.roi_x,self.roi_y,self.roi_w,self.roi_h]
             print("xywh_stop_sign:{}".format(xywh_stop_sign))
@@ -106,8 +111,20 @@ class PedestrainDataset(BaseDatasets):
 
             
             ## not overlapped with other bounding box
-            if os.path.exists(self.label_path):
-                with open(self.label_path,'r') as f:
+            im,im_name = self.Parse_path_2(self.label_path)
+            label_txt = im_name + ".txt"
+            save_txt_path = os.path.join(self.save_dir,"labels",label_txt)
+
+            if os.path.exists(save_txt_path):
+                open_path = save_txt_path
+                #print("open_path = {}".format(open_path))
+                #input()
+            else:
+                open_path = self.label_path
+
+
+            if os.path.exists(open_path):
+                with open(open_path,'r') as f:
                     lines = f.readlines()
                     for line in lines:
                         line_list = line.split(" ")
@@ -136,7 +153,7 @@ class PedestrainDataset(BaseDatasets):
                         iou = self.get_iou(bb_stopsign,bb_bdd100k)
                         print("iou={}".format(iou))
                         #input()
-                        if iou > 0.10:
+                        if iou > self.overlap_th:
                             OVERLAPPED=True
                             IS_FAILED=True
                             print("case 1 : iou={}".format(iou))
@@ -152,6 +169,17 @@ class PedestrainDataset(BaseDatasets):
                             #input()
             else:
                 OVERLAPPED=False
+
+
+        if cnt>200:
+            roi_h_pre = self.roi_h
+            self.roi_h = 30
+            self.roi_w = int(self.roi_w * float(60/roi_h_pre))
+            print("case 3: cnt>100")
+            print("after correct")
+            print("self.roi_w:{}".format(self.roi_w))
+            print("self.roi_h:{}".format(self.roi_h))
+
         print("final self.roi_w :{}".format(self.roi_w))
         print("final self.roi_h :{}".format(self.roi_h))
         self.roi_resized = cv2.resize(roi,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)

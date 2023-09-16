@@ -44,13 +44,13 @@ class StopSignDataset(BaseDatasets):
         
         ## initial random (x,y)
         x = random.randint(0,self.im.shape[1]-1)
-        y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
+        y = random.randint(self.vanish_y - 50,int(self.im.shape[0]*self.carhood_ratio))
 
         ## Stop should put at non-drivable area
         cnt = 1
         while(mask[y][x][0]!=0): # Exist while when (x,y) is in non-drivable area
             x = random.randint(0,self.im.shape[1]-1)
-            y = random.randint(self.vanish_y - 100,int(self.im.shape[0]*self.carhood_ratio))
+            y = random.randint(self.vanish_y - 50,int(self.im.shape[0]*self.carhood_ratio))
             cnt+=1
             if cnt==100:
                 break
@@ -58,6 +58,8 @@ class StopSignDataset(BaseDatasets):
         self.roi_y  = y
         return (x,y)
         return NotImplementedError
+
+    
 
     def Get_ROI_WH_In_Image(self,roi,roi_mask,dri_path):
         OVERLAPPED=True
@@ -91,14 +93,14 @@ class StopSignDataset(BaseDatasets):
                 print("self.roi_w:{}".format(self.roi_w))
                 print("self.roi_h:{}".format(self.roi_h))
 
-            if cnt>50:
-                roi_h_pre = self.roi_h
-                self.roi_h = 60
-                self.roi_w = int(self.roi_w * float(60/roi_h_pre))
-                print("case 3: cnt>100")
-                print("after correct")
-                print("self.roi_w:{}".format(self.roi_w))
-                print("self.roi_h:{}".format(self.roi_h))
+            # if cnt>50:
+            #     roi_h_pre = self.roi_h
+            #     self.roi_h = 60
+            #     self.roi_w = int(self.roi_w * float(60/roi_h_pre))
+            #     print("case 3: cnt>100")
+            #     print("after correct")
+            #     print("self.roi_w:{}".format(self.roi_w))
+            #     print("self.roi_h:{}".format(self.roi_h))
 
             xywh_stop_sign = [self.roi_x,self.roi_y,self.roi_w,self.roi_h]
             print("xywh_stop_sign:{}".format(xywh_stop_sign))
@@ -106,8 +108,22 @@ class StopSignDataset(BaseDatasets):
 
             
             ## not overlapped with other bounding box
-            if os.path.exists(self.label_path):
-                with open(self.label_path,'r') as f:
+            im,im_name = self.Parse_path_2(self.label_path)
+            label_txt = im_name + ".txt"
+            save_txt_path = os.path.join(self.save_dir,"labels",label_txt)
+
+            if os.path.exists(save_txt_path):
+                open_path = save_txt_path
+                #print("open_path = {}".format(open_path))
+                #input()
+            else:
+                open_path = self.label_path
+           
+            
+            #print(open_path)
+            #input()
+            if os.path.exists(open_path):
+                with open(open_path,'r') as f:
                     lines = f.readlines()
                     for line in lines:
                         line_list = line.split(" ")
@@ -136,10 +152,10 @@ class StopSignDataset(BaseDatasets):
                         iou = self.get_iou(bb_stopsign,bb_bdd100k)
                         print("iou={}".format(iou))
                         #input()
-                        if iou > 0.10:
+                        if iou > self.overlap_th:
                             OVERLAPPED=True
                             IS_FAILED=True
-                            print("case 1 : iou={}".format(iou))
+                            print("case 1 : iou={} > {}".format(iou,self.overlap_th))
                             
                             
                             cnt+=1
@@ -157,7 +173,16 @@ class StopSignDataset(BaseDatasets):
                 print("cnt = {}".format(cnt))        
 
             cnt+=1
-            print("cnt = {}".format(cnt))     
+            print("cnt = {}".format(cnt))    
+
+        if cnt>100:
+                roi_h_pre = self.roi_h
+                self.roi_h = 30
+                self.roi_w = int(self.roi_w * float(60/roi_h_pre))
+                print("case 3: cnt>100")
+                print("after correct")
+                print("self.roi_w:{}".format(self.roi_w))
+                print("self.roi_h:{}".format(self.roi_h))
 
         self.roi_resized = cv2.resize(roi,(self.roi_w,self.roi_h),interpolation=cv2.INTER_NEAREST)
 

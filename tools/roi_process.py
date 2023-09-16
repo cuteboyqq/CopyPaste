@@ -37,22 +37,32 @@ class ROIProcess:
         c=1
         roi_path_list = glob.glob(os.path.join(self.data_dir,"***","**","roi","*.jpg"))
         for roi_path in roi_path_list:
-            print("{}:{}".format(c,roi_path))
+            #print("{}:{}".format(c,roi_path))
             save_roi_dir = os.path.join(self.save_dir,"roi")
             os.makedirs(save_roi_dir,exist_ok=True)
             
             save_mask_dir = os.path.join(self.save_dir,"mask")
             os.makedirs(save_mask_dir,exist_ok=True)
             c+=1
-            file,file_dir,attribute_name,label_name = self.parse_path(roi_path)
+            file,file_dir,attribute_dir,label_dir = self.parse_path(roi_path)
+            #print(label_dir)
+            #print(attribute_dir)
             #label, label_detail = self.parse_nuimage_foldername(label_name)
-            mask_path = os.path.join(attribute_name,"mask",file)
+            attribute_name = os.path.basename(attribute_dir)
+            label_name = os.path.basename(label_dir)
+            #print(label_name)
+            #print(attribute_name)
+            mask_path = os.path.join(attribute_dir,"mask",file)
 
             if os.path.exists(mask_path) and (label_name in self.nuimage_wanted_label or attribute_name in self.nuimage_wanted_label_detail):
-                print("{}/{}".format(label_name,attribute_name))
-                shutil.copy(mask_path,save_mask_dir)
-                shutil.copy(roi_path,save_roi_dir)
-                print("{}:{} copy successful".format(c,file))
+                roi = cv2.imread(roi_path)
+                h,w=roi.shape[0],roi.shape[1]
+                if h*w>=1200:
+                    print("{}/{}".format(label_name,attribute_name))
+                    shutil.copy(mask_path,save_mask_dir)
+                    shutil.copy(roi_path,save_roi_dir)
+                    print("{}:{} copy successful".format(c,file))
+
 
 
         # mask_path_list = glob.glob(os.path.join(self.data_dir,"***","**","mask","*.jpg"))

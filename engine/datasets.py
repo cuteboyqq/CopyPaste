@@ -24,6 +24,7 @@ class BaseDatasets:
         ## other setting
         self.carhood_ratio = args.carhood_ratio
         self.num_img = args.num_img
+        self.overlap_th = args.overlap_th
         self.data_info = []
         cnt = 1
         for i in range(self.num_img+1):
@@ -48,7 +49,7 @@ class BaseDatasets:
                     break
 
             if vanish_y>= int(im_h * self.carhood_ratio):
-                vanish_y = int(im_h * self.carhood_ratio) - 100
+                vanish_y = int(im_h * self.carhood_ratio)
                 
         
             self.vanish_y = vanish_y
@@ -80,6 +81,11 @@ class BaseDatasets:
         self.im_name = self.im.split(".")[0]
         #print(self.im)
         #print(self.im_name)
+
+    def Parse_path_2(self,path):
+        im = path.split("/")[-1]
+        im_name = im.split(".")[0]
+        return im, im_name
 
     def Get_Possible_ROI_Position_Area(self):
         #This are different to roi labels
