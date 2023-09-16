@@ -1,4 +1,9 @@
 # CopyPaste
+
+![copypaste](https://github.com/cuteboyqq/CopyPaste/assets/58428559/56e484ee-d467-4c9b-b7e2-6d4f76463edb)
+
+![mask](https://github.com/cuteboyqq/CopyPaste/assets/58428559/45f1884d-bc75-4398-833d-7ffd838dd1cc)
+
 ![1d066a79-4ab695ca](https://github.com/cuteboyqq/CopyPaste/assets/58428559/be432074-9df1-4984-a183-13b8ff404f5a)
 ![1bf63d58-1e0188d8](https://github.com/cuteboyqq/CopyPaste/assets/58428559/25b4b7e4-8b0d-4159-a1c8-464444ee51e1)
 ![1af21ce1-97d4a34b](https://github.com/cuteboyqq/CopyPaste/assets/58428559/4bac861e-7dc0-4bb9-870f-ecf9fe027c79)
