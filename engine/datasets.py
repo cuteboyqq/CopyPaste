@@ -237,6 +237,11 @@ class BaseDatasets:
         iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
         #assert iou >= 0.0
         #assert iou <= 1.0
+
+        if bb1['x1']>bb2['x1'] and bb1['y1']>bb2['y1'] and bb1['x2']<bb2['x2'] and bb1['y2']<bb2['y2']:
+            iou = 0.9999
+        if bb1['x1']<bb2['x1'] and bb1['y1']<bb2['y1'] and bb1['x2']>bb2['x2'] and bb1['y2']>bb2['y2']:
+            iou = 0.9999
         return iou
 
     def xywh_to_xyxy(self,xywh):

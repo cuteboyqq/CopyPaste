@@ -25,14 +25,15 @@ Pedestrian_num = 19999
 
 ## Keep the traffic sign
 KEEP_TRAFFIC_SIGN=True
+TRAIN=True
 
 if KEEP_TRAFFIC_SIGN:
     StopSign_label = 10
     LaneMarking_label = 11 
     Pedestrian_label = 0
-    IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/train"
-    LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train"
-    DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train"
+    IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/val"
+    LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/val"
+    DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/val"
 
 else:
     StopSign_label = 9
@@ -40,6 +41,24 @@ else:
     Pedestrian_label = 0
     IMAGE_DIR = "/home/ali/Projects/datasets/bdd100k_data/images/100k/train"
     LABEL_DIR = "/home/ali/Projects/datasets/bdd100k_data/labels/detection/train"
+
+if TRAIN:
+    STOPSIGN_ROI_DIR = "./datasets/ROI/stopsign/train/roi"
+    LANEMARKING_ROI_DIR = "./datasets/ROI/lanemarking/train/roi"
+    PEDESTRIAN_ROI_DIR = "./datasets/ROI/pedestrain/train/roi"
+
+    STOPSIGN_MASK_DIR = "./datasets/ROI/stopsign/train/mask"
+    LANEMARKING_MASK_DIR = "./datasets/ROI/lanemarking/train/mask"
+    PEDESTRIAN_MASK_DIR = "./datasets/ROI/pedestrain/train/mask"
+else:
+    STOPSIGN_ROI_DIR = "./datasets/ROI/stopsign/val/roi"
+    LANEMARKING_ROI_DIR = "./datasets/ROI/lanemarking/val/roi"
+    PEDESTRIAN_ROI_DIR = "./datasets/ROI/pedestrain/val/roi"
+
+    STOPSIGN_MASK_DIR = "./datasets/ROI/stopsign/val/mask"
+    LANEMARKING_MASK_DIR = "./datasets/ROI/lanemarking/val/mask"
+    PEDESTRIAN_MASK_DIR = "./datasets/ROI/pedestrain/val/mask"
+
 
 def get_args_StopSign():
     import argparse
@@ -51,10 +70,10 @@ def get_args_StopSign():
                         default=DRI_DIR)
     ##   Stop sign ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',\
-                        default="./datasets/ROI/stopsign/roi")
+                        default=STOPSIGN_ROI_DIR)
     
     parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
-                        default="./datasets/ROI/stopsign/mask")
+                        default=STOPSIGN_MASK_DIR)
     ## Save parameters
     parser.add_argument('-savedir','--save-dir',help='save img dir',default="./runs/generate_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save stopsign fake images')
@@ -95,9 +114,9 @@ def get_args_LaneMarking():
                         default=DRI_DIR)
     
     ##   lanemarking  ROI/Mask directory
-    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="./datasets/ROI/lanemarking/roi")
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',default=LANEMARKING_ROI_DIR)
 
-    parser.add_argument('-maskdir','--mask-dir',help='roi mask dir',default="./datasets/ROI/lanemarking/mask")
+    parser.add_argument('-maskdir','--mask-dir',help='roi mask dir',default=LANEMARKING_MASK_DIR)
 
 
     
@@ -145,10 +164,10 @@ def get_args_Pedestrain():
                         default=DRI_DIR)
     ##   Pedestrian ROI/Mask directory
     parser.add_argument('-roidir','--roi-dir',help='roi dir',\
-                        default="./datasets/ROI/pedestrain/roi")
+                        default=PEDESTRIAN_ROI_DIR)
     
     parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
-                        default="./datasets/ROI/pedestrain/mask")
+                        default=PEDESTRIAN_MASK_DIR)
     ## Save parameters
     parser.add_argument('-savedir','--save-dir',help='save img dir',default="./runs/generate_pedestrain_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
@@ -174,13 +193,31 @@ def get_args_label():
     import argparse
     parser = argparse.ArgumentParser()
     ##   BDD100k datasets directory
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
-    parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
-                        default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
+    # parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
+    # parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
+    # parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
+    #                     default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
+    
+    # parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
+    #                     default="/home/ali/Projects/datasets/BDD100K-ori/labels/lane/colormaps/train")
+
+    # ## Save parameters
+    # parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/re-label/train")
+    # parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
+    # parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
+    
+    # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
+
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/images/train")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/detection/train")
+    parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
+                        default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
+    
+    parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
+                        default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/lane/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/re-label/train")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/correct_datasets")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
