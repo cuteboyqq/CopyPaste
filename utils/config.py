@@ -31,9 +31,14 @@ if KEEP_TRAFFIC_SIGN:
     StopSign_label = 10
     LaneMarking_label = 11 
     Pedestrian_label = 0
-    IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/val"
-    LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/val"
-    DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/val"
+    if TRAIN:
+        IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/train"
+        LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train"
+        DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train"
+    else:
+        IMAGE_DIR = "/home/ali/Projects/datasets/BDD100K-ori/images/100k/val"
+        LABEL_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/detection/val"
+        DRI_DIR = "/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/val"
 
 else:
     StopSign_label = 9
