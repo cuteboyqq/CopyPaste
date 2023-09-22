@@ -21,6 +21,10 @@ class ROIProcess:
                             ]
         self.nuimage_wanted_label_detail = ["cycle.with_rider"]
 
+        ## roi directory
+        self.roi_dir = args.roi_dir
+        self.mask_dir = args.mask_dir
+
     def parse_path(self,path):
         file = path.split("/")[-1]
         file_dir = os.path.dirname(path)
@@ -57,19 +61,43 @@ class ROIProcess:
             if os.path.exists(mask_path) and (label_name in self.nuimage_wanted_label or attribute_name in self.nuimage_wanted_label_detail):
                 roi = cv2.imread(roi_path)
                 h,w=roi.shape[0],roi.shape[1]
-                if h*w>=1200:
+                if h*w>=0:
                     print("{}/{}".format(label_name,attribute_name))
                     shutil.copy(mask_path,save_mask_dir)
                     shutil.copy(roi_path,save_roi_dir)
                     print("{}:{} copy successful".format(c,file))
 
-
+    
 
         # mask_path_list = glob.glob(os.path.join(self.data_dir,"***","**","mask","*.jpg"))
         # for mask_path in mask_path_list:
         #     print(mask_path)
+    def parse_path_2(self,path):
+        file=path.split("/")[-1]
+        file_name = file.split(".")[0]
+        path_dir = os.path.dirname(path)
+        path_dir_dir = os.path.dirname(path_dir)
+        return file, file_name,path_dir,path_dir_dir
+    
+    def GetCorrespondingMasks(self):
+        roi_path_list = glob.glob(os.path.join(self.roi_dir,"*.jpg"))
+        print(roi_path_list)
+        c = 1
+        for roi_path in roi_path_list:
+            file, file_name, path_dir,path_dir_dir = self.parse_path_2(roi_path)
+            print(path_dir_dir)
+            mask = file
+            mask_path = os.path.join(self.mask_dir,mask)
+            print(mask_path)
+            save_mask_dir = os.path.join(path_dir_dir,"mask")
+            if os.path.exists(mask_path):
+                shutil.copy(mask_path,save_mask_dir)
+                print("{}: {} copy succesful!".format(c,file))
+                c+=1
 
 if __name__=="__main__":
     args = get_args_roi()
     roi = ROIProcess(args)
     roi.ParseNuImageROIDataset()
+    #roi.GetCorrespondingMasks()
+

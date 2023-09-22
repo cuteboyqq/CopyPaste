@@ -55,7 +55,23 @@ class LabelDatasets:
             f.close()
             f_new.close()
 
-    
+    def SplitAllImagesToSpitFolders(self):
+        img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
+        num_images = len(img_path_list)
+        count = 1
+        folder_label = 1
+
+        for i in range(len(img_path_list)):
+            save_folder = "train_" + str(int((i+1)/2500)+1)
+            img_path = img_path_list[i]
+            file,file_name = self.parse_path(img_path)
+            save_dir = os.path.join(self.save_img_dir,save_folder)
+            os.makedirs(save_dir,exist_ok=True)
+            shutil.copy(img_path,save_dir)
+            print("{} : copy successful".format(i))
+            i+=1
+            
+
     def CorrectNumberOfImagesAndLablesInDatasets(self):
         img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
         #label_path_list = os.path.join(self.label_dir,"*.txt")
@@ -129,11 +145,13 @@ class LabelDatasets:
                 pass
 
 
+
 if __name__=="__main__":
 
     label_parameters = get_args_label()
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
-    label.CorrectNumberOfImagesAndLablesInDatasets()
+    #label.CorrectNumberOfImagesAndLablesInDatasets()
+    label.SplitAllImagesToSpitFolders()
                         
 
