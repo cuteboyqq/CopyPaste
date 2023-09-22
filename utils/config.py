@@ -6,9 +6,9 @@ import numpy as np
 ## Setting here is more convienent than setting on the default of arguments.....
 
 ## Generate Number of images
-StopSign_num = 22000
-LnaeMarking_num = 21000
-Pedestrian_num = 19999
+StopSign_num = 41000
+LnaeMarking_num = 39999
+Pedestrian_num = 10
 
 ## label settings
 
@@ -113,8 +113,8 @@ def get_args_LaneMarking():
     ##   BDD100k datasets directory
 
     # image is from previous generate stop sign images
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/generate_images/images")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/generate_images/labels")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="./runs/generate_images/images")#"./runs/generate_images/images"
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="./runs/generate_images/labels")#"./runs/generate_images/labels"
     parser.add_argument('-dridir','--dri-dir',help='drivable label dir', \
                         default=DRI_DIR)
     
@@ -213,8 +213,8 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/images/train")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/detection/train")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/nuimages/nuimages-dataset/images/train")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimages-dataset/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
     
@@ -222,7 +222,7 @@ def get_args_label():
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/lane/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/correct_datasets")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/split_bdd100k_train_images")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -234,7 +234,9 @@ def get_args_roi():
     parser = argparse.ArgumentParser()
     ##   BDD100k datasets directory
     parser.add_argument('-datadir','--data-dir',help='data dir',default="/home/ali/Projects/datasets/nuimages/roi_train")
-    parser.add_argument('-savedir','--save-dir',help='save dir',default="./nuimages_roi")
+    parser.add_argument('-savedir','--save-dir',help='save dir',default="./nuimages_roi_2023-09-21")
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/runs/predict/0_filtered/train/roi")
+    parser.add_argument('-maskdir','--mask-dir',help='mask dir',default="/home/ali/Projects/GitHub_Code/ali/landmark_issue/runs/predict/0/mask")
     return parser.parse_args()
 
 

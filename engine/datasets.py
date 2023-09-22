@@ -23,6 +23,9 @@ class BaseDatasets:
 
         ## other setting
         self.carhood_ratio = args.carhood_ratio
+
+        
+
         self.num_img = args.num_img
         self.overlap_th = args.overlap_th
         self.data_info = []
@@ -41,6 +44,7 @@ class BaseDatasets:
             self.dri = cv2.imread(dri_path)
             im_h = self.im.shape[0]
             vanish_y = 0
+            
             x = int(self.im.shape[1]/2.0)
             while(self.dri[vanish_y][x][0]==0):
                 if vanish_y+1< (im_h-1):
@@ -55,9 +59,20 @@ class BaseDatasets:
             self.vanish_y = vanish_y
 
 
-
+            x = int(self.im.shape[1]/2.0)
+            car_hood_y = self.im.shape[0]-1
+            while(self.dri[car_hood_y][x][0]==0):
+                if car_hood_y-1>self.vanish_y:
+                    car_hood_y-=1
+                else:
+                    break
+            ## update  carhood_ratio
+            self.carhood_ratio = float(car_hood_y / self.im.shape[0])
+            #print(self.vanish_y)
+            #print(car_hood_y)
+            #input()
             print("i = {}".format(i))
-            self.data_info.append([self.im_path,     dri_path,    self.vanish_y,   label_path])
+            self.data_info.append([self.im_path,     dri_path,    self.vanish_y,   label_path,      self.carhood_ratio])
             cnt+=1
             
         # roi datasets
@@ -260,7 +275,7 @@ class BaseDatasets:
         print(len(self.data_info))
         for i in range(len(self.data_info)):
             ## Get image information
-            self.im_path, self.dri_path, self.vanish_y, self.label_path = self.data_info[i]
+            self.im_path, self.dri_path, self.vanish_y, self.label_path, self.carhood_ratio = self.data_info[i]
 
 
             self.im = cv2.imread(self.im_path)

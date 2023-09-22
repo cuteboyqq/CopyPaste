@@ -7,9 +7,10 @@ import glob
 from engine.datasets import BaseDatasets
 
 class LaneMarkingDataset(BaseDatasets):
-    # def __init__(self):
+    # def __init__(self,args):
+    #     super.__init__(self)
     #     self.label = 11 #Stop sign label
-    #     self.method = "mask"
+    #     self.method = args.method
     
 
     def Get_ROI_Label(self):

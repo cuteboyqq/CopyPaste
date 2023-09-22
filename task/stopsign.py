@@ -44,6 +44,7 @@ class StopSignDataset(BaseDatasets):
         
         ## initial random (x,y)
         x = random.randint(0,self.im.shape[1]-1)
+        print("self.carhood_ratio:{}".format(self.carhood_ratio))
         y = random.randint(self.vanish_y - 50,int(self.im.shape[0]*self.carhood_ratio))
 
         ## Stop should put at non-drivable area
