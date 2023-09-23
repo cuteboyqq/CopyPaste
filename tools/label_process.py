@@ -73,7 +73,7 @@ class LabelDatasets:
             
 
     def CorrectNumberOfImagesAndLablesInDatasets(self):
-        img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
+        img_path_list = glob.glob(os.path.join(self.img_dir,"**","*.jpg"))
         #label_path_list = os.path.join(self.label_dir,"*.txt")
         #drivable_path_list = os.path.join(self.drivable_dir,"*.png")
 
@@ -84,16 +84,16 @@ class LabelDatasets:
         save_label_dir = os.path.join(self.save_dir,"labels","detection","train")
         os.makedirs(save_label_dir,exist_ok=True)
 
-        save_lane_mask_dir = os.path.join(self.save_dir,"labels","lane","train","masks")
+        save_lane_mask_dir = os.path.join(self.save_dir,"labels","lane","masks","train")
         os.makedirs(save_lane_mask_dir,exist_ok=True)
 
-        save_lane_colormap_dir = os.path.join(self.save_dir,"labels","lane","train","colormaps")
+        save_lane_colormap_dir = os.path.join(self.save_dir,"labels","lane","colormaps","train")
         os.makedirs(save_lane_colormap_dir,exist_ok=True)
 
-        save_drivable_mask_dir = os.path.join(self.save_dir,"labels","drivable","train","masks")
+        save_drivable_mask_dir = os.path.join(self.save_dir,"labels","drivable","masks","train")
         os.makedirs(save_drivable_mask_dir,exist_ok=True)
 
-        save_drivable_colormap_dir = os.path.join(self.save_dir,"labels","drivable","train","colormaps")
+        save_drivable_colormap_dir = os.path.join(self.save_dir,"labels","drivable","colormaps","train")
         os.makedirs(save_drivable_colormap_dir,exist_ok=True)
         c = 1
         for img_path in  img_path_list:
@@ -101,24 +101,29 @@ class LabelDatasets:
             print("{}:{}".format(c,file))
             c+=1
             label = file_name + ".txt"
-            label_path = os.path.join(self.label_dir,label)
+            label_path = os.path.join(self.label_dir,"train",label)
+
+            ## check label.txt exist or not
             if not os.path.exists(label_path):
                 print("label_path not exists :{}".format(label_path))
                 continue
-            drivable_label = file_name + ".png"
-            drivable_colormap_path = os.path.join(self.drivable_dir,"colormaps",drivable_label)
+            drivable_label = file_name + ".jpg"
+            drivable_colormap_path = os.path.join(self.drivable_dir,"colormaps","train",drivable_label)
 
-            drivable_mask_path = os.path.join(self.drivable_dir,"masks",drivable_label)
-
+            drivable_mask_path = os.path.join(self.drivable_dir,"masks","train",drivable_label)
+            ## check drivable map exist or not
             if not os.path.exists(drivable_colormap_path):
-                print("drivable_colormap_path not exists")
+                print("drivable_colormap_path not exists :{}".format(drivable_colormap_path))
+                #co = cv2.imread(drivable_colormap_path)
+                #cv2.imshow("co",co)
+                #cv2.waitKey(2000)
                 continue
-
+            
             lane_label_jpg = file_name + ".jpg"
-            lane_colormap_path = os.path.join(self.lane_dir,"colormaps",lane_label_jpg)
-            lane_label_png = file_name + ".png"
-            lane_mask_path = os.path.join(self.lane_dir,"masks",lane_label_png)
-
+            lane_colormap_path = os.path.join(self.lane_dir,"colormaps","train",lane_label_jpg)
+            lane_label_png = file_name + ".jpg"
+            lane_mask_path = os.path.join(self.lane_dir,"masks","train",lane_label_png)
+            ## check lane map exist or not
             if not os.path.exists(lane_colormap_path):
                 print("lane_colormap_path not exists:{}".format(lane_colormap_path))
                 continue
@@ -151,7 +156,7 @@ if __name__=="__main__":
     label_parameters = get_args_label()
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
-    #label.CorrectNumberOfImagesAndLablesInDatasets()
-    label.SplitAllImagesToSpitFolders()
+    label.CorrectNumberOfImagesAndLablesInDatasets()
+    #label.SplitAllImagesToSpitFolders()
                         
 
