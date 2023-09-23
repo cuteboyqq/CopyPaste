@@ -47,15 +47,13 @@ class BaseDatasets:
             
             x = int(self.im.shape[1]/2.0)
             while(self.dri[vanish_y][x][0]==0):
-                if vanish_y+1< (im_h-1):
+                if vanish_y+1< (im_h)*0.70:
                     vanish_y+=1
                 else:
                     break
 
-            if vanish_y>= int(im_h * self.carhood_ratio):
-                vanish_y = int(im_h * self.carhood_ratio)
+            
                 
-        
             self.vanish_y = vanish_y
 
 
@@ -71,6 +69,8 @@ class BaseDatasets:
             #print(self.vanish_y)
             #print(car_hood_y)
             #input()
+            if self.vanish_y>= int(im_h * self.carhood_ratio):
+                self.vanish_y = int(im_h * self.carhood_ratio) - 50
             print("i = {}".format(i))
             self.data_info.append([self.im_path,     dri_path,    self.vanish_y,   label_path,      self.carhood_ratio])
             cnt+=1
@@ -106,7 +106,7 @@ class BaseDatasets:
         #This are different to roi labels
         return NotImplemented
 
-    def Get_ROI_XY_In_Image(self):
+    def Get_ROI_XY_In_Image(self,vanish_y,carhood_ratio):
         # x = 0
         # y = 0
         # return (x,y)
@@ -122,8 +122,8 @@ class BaseDatasets:
     
         return NotImplementedError
 
-    def Get_ROI_lxywh_In_Image(self,roi,roi_mask, dri_path):
-        x,y  = self.Get_ROI_XY_In_Image()
+    def Get_ROI_lxywh_In_Image(self,roi,roi_mask,vanish_y,carhood_ratio ,dri_path):
+        x,y  = self.Get_ROI_XY_In_Image(vanish_y,carhood_ratio)
         w,h,roi,mask = self.Get_ROI_WH_In_Image(roi,roi_mask,dri_path)
         label = self.Get_ROI_Label()
         return (label,x,y,w,h,roi,mask)
@@ -292,19 +292,19 @@ class BaseDatasets:
             
             if self.num_roi == 1:
                 COPY_ORI_TXT_DONE=False
-                COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,COPY_ORI_TXT_DONE)
+                COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,self.vanish_y,self.carhood_ratio,COPY_ORI_TXT_DONE)
             else:
                 COPY_ORI_TXT_DONE = False
                 for i in range(len(roi_roimask)):
                     roi = roi_roimask[i][0]
                     roi_mask = roi_roimask[i][1]
-                    COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,COPY_ORI_TXT_DONE)
+                    COPY_ORI_TXT_DONE = self.CopyPasteOneROI(roi,roi_mask,self.vanish_y,self.carhood_ratio,COPY_ORI_TXT_DONE)
                     
 
-    def CopyPasteOneROI(self,roi,roi_mask,COPY_ORI_TXT_DONE):
+    def CopyPasteOneROI(self,roi,roi_mask,vanish_y,carhood_ratio,COPY_ORI_TXT_DONE):
         ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
         #  
-        l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask, self.dri_path)
+        l,x,y,w,h,roi,roi_mask = self.Get_ROI_lxywh_In_Image(roi,roi_mask,vanish_y,carhood_ratio, self.dri_path)
         print("{},{},{},{},{}".format(l,x,y,w,h))
         print("roi:{}".format(roi.shape))
         print("roi_mask:{}".format(roi_mask.shape))

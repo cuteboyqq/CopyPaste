@@ -38,18 +38,18 @@ class PedestrainDataset(BaseDatasets):
         return mask
 
 
-    def Get_ROI_XY_In_Image(self):
+    def Get_ROI_XY_In_Image(self,vanish_y,carhood_ratio):
         mask = self.Get_Possible_ROI_Position_Area()
         
         ## initial random (x,y)
         x = random.randint(0,self.im.shape[1]-1)
-        y = random.randint(self.vanish_y-50,int(self.im.shape[0]*self.carhood_ratio))
+        y = random.randint(vanish_y-50,int(self.im.shape[0]*carhood_ratio))
 
         ## Pedestrain put at non-drivable area
         cnt = 1
         while(mask[y][x][0]!=0): # Exist while when (x,y) is not in drivable area
             x = random.randint(0,self.im.shape[1]-1)
-            y = random.randint(self.vanish_y-50,int(self.im.shape[0]*self.carhood_ratio))
+            y = random.randint(vanish_y-50,int(self.im.shape[0]*carhood_ratio))
             cnt+=1
             if cnt==100:
                 break

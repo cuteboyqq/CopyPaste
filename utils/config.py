@@ -6,8 +6,8 @@ import numpy as np
 ## Setting here is more convienent than setting on the default of arguments.....
 
 ## Generate Number of images
-StopSign_num = 41000
-LnaeMarking_num = 39999
+StopSign_num = 22000
+LnaeMarking_num = 21000
 Pedestrian_num = 10
 
 ## label settings

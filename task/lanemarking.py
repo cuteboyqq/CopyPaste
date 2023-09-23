@@ -44,7 +44,7 @@ class LaneMarkingDataset(BaseDatasets):
         return mask
 
 
-    def Get_ROI_XY_In_Image(self):
+    def Get_ROI_XY_In_Image(self,vanish_y,carhood_ratio):
         #self.vanish_y = self.Get_Update_Vanish_Y()
         print("self.vanish_y:{}".format(self.vanish_y))
         #input()
@@ -52,14 +52,24 @@ class LaneMarkingDataset(BaseDatasets):
         
         ## initial random (x,y)
         x = random.randint(int(self.im.shape[1]*float(2/7)) ,int(self.im.shape[1]*float(5/7)))
-        y = random.randint(self.vanish_y,int(self.im.shape[0]*self.carhood_ratio))
+        range = int(self.im.shape[0]*carhood_ratio) - vanish_y
+        y = random.randint(vanish_y,int(self.im.shape[0]*carhood_ratio)-int(range/2.0))
+        # if self.vanish_y + 100 < self.im.shape[0] - 1:
+        #     y = random.randint(self.vanish_y,int(self.vanish_y+100))
+        # else:
+        #     y = self.vanish_y
 
         ## Stop should put at non-drivable area
         cnt = 1
         while(mask[y][x][0]==0): # Exist while when (x,y) is in drivable area
             print("mask[y][x][0]==0 re-assign XY~~~~")
+            ra = random.randint(3,8)
             x = random.randint(int(self.im.shape[1]*float(2/7)) ,int(self.im.shape[1]*float(5/7)))
-            y = random.randint(self.vanish_y,int(self.im.shape[0]*self.carhood_ratio))
+            y = random.randint(vanish_y,int(self.im.shape[0]*carhood_ratio)-int(range*2/ra))
+            # if self.vanish_y+100 < self.im.shape[0] - 1:
+            #     y = random.randint(self.vanish_y,int(self.vanish_y+100))
+            # else:
+            #     y = self.vanish_y
             cnt+=1
             if cnt==100:
                 break
@@ -114,6 +124,13 @@ class LaneMarkingDataset(BaseDatasets):
         ratio = float(self.roi_w/roi.shape[1])
         self.roi_h = int(roi.shape[0]*ratio)
         
+        # ## check ratio
+        # if ratio < 0.33:
+        #     self.roi_w = int(lane_width * 0.20)
+        
+        # ratio = float(self.roi_w/roi.shape[1])
+        # self.roi_h = int(roi.shape[0]*ratio)
+
         ##Check roi_w, roi_h
         if self.roi_h >= int(self.im.shape[0] * 0.30):
             self.roi_h = int(self.im.shape[0] * 0.30)
