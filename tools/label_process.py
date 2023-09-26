@@ -5,6 +5,7 @@ import glob
 import os
 import shutil
 import cv2
+import numpy as np
 
 ## how the argsparse list
 #https://stackoverflow.com/questions/15753701/how-can-i-pass-a-list-as-a-command-line-argument-with-argparse
@@ -31,6 +32,27 @@ class LabelDatasets:
         os.makedirs(self.save_dir,exist_ok=True)
         os.makedirs(self.save_img_dir,exist_ok=True)
         os.makedirs(self.save_txt_dir,exist_ok=True)
+
+
+        self.dilation_kernel = 7
+        self.process_type = args.process_type
+
+        # lane_mapping: {0: 2,            1: lane_bg,     2: 1,           3: 3,           4: 5, 
+        #         5: lane_bg,     6: 2,           7: 3,           8: lane_bg,     9: lane_bg,
+        #         10: lane_bg,    11: lane_bg,    12: lane_bg,    13: lane_bg,    14: lane_bg,
+        #         15: lane_bg,    16: 2,          17: lane_bg,    18: 1,          19: 3,
+        #         20: 5,          21: lane_bg,    22: 2,          23: 3,          24: lane_bg,
+        #         25: lane_bg,    26: lane_bg,    27: lane_bg,    28: lane_bg,    29: lane_bg,
+        #         30: lane_bg,    31: lane_bg,    32: 4,          33: lane_bg,    34: lane_bg,  
+        #         35: lane_bg,    36: 5,          37: lane_bg,    38: 4,          39: lane_bg,
+        #         40: lane_bg,    41: lane_bg,    42: lane_bg,    43: lane_bg,    44: lane_bg,
+        #         45: lane_bg,    46: lane_bg,    47: lane_bg,    48: 4,          49: lane_bg,
+        #         50: lane_bg,    51: lane_bg,    52: 5,          53: lane_bg,    54: 4,
+        #         55: lane_bg,
+        #         255: lane_bg}
+
+        self.lane_mapping = {0:255,  1:2,  2:0,  3:3,   4:32,   5:4}
+
 
     def parse_path(self,path):
         file = path.split("/")[-1]
@@ -70,7 +92,140 @@ class LabelDatasets:
             shutil.copy(img_path,save_dir)
             print("{} : copy successful".format(i))
             i+=1
+    
+    def parse_path_2(self,path):
+        local_path = path.split(os.path.dirname(self.img_dir))[1]
+        local_path = "./images" + local_path
+        return local_path
+
+    def Get_datasets_img_path_txt(self):
+
+        train_img_path_list = glob.glob(os.path.join(self.img_dir,"train","*.jpg"))
+        if len(train_img_path_list)==0:
+            train_img_path_list = glob.glob(os.path.join(self.img_dir,"train","*.png"))
+        val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.jpg"))
+        if len(val_img_path_list)==0:
+            val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.png"))
+
+        train_f = open("train_new_2023-09-26.txt","a")
+        for i in range(len(train_img_path_list)):
+            local_path = self.parse_path_2(train_img_path_list[i])
+            print("train {}:{}".format(i,local_path))
+            train_f.write(local_path)
+            train_f.write("\n")
+
+        train_f.close()
+
+
+        val_f = open("val_new.txt","a")
+        for i in range(len(val_img_path_list)):
+            local_path = self.parse_path_2(val_img_path_list[i])
+            print("val {}:{}".format(i,local_path))
+            val_f.write(local_path)
+            val_f.write("\n")
+
+        val_f.close()
+    
+    ## func: process_lane_map
+    ## Erode the maps
+    def process_lane_map(self):
+        lane_map_path_list = glob.glob(os.path.join(self.lane_dir,self.process_type,"train","*.jpg"))
+        for i in range(len(lane_map_path_list)):
+            print(lane_map_path_list[i])
+            print(len(lane_map_path_list))
+            mask = cv2.imread(lane_map_path_list[i])
+            #cv2.imshow("mask",mask)
+            #cv2.waitKey(2000)
+            #cv2.destroyAllWindows()
+            eroded_mask = self.split_map_and_erode(mask)
+            file,file_name = self.parse_path(lane_map_path_list[i])
+            new_folder_name = "eroded_" + self.process_type 
+            save_dir = os.path.join(self.save_dir,"labels","lane",new_folder_name,"train")
+            os.makedirs(save_dir,exist_ok=True)
+            #print("save_path :{}".format(save_path))
+            cv2.imwrite(save_dir+"/"+file_name+".png",eroded_mask)
+            print("{}:save new mask succesful".format(i))
+
+    ## Do Erosion
+    def split_map_and_erode(self,mask):
+        #print("mask:{}".format(mask.shape)) #900,600,3
+        """Split mask to n-channels map where n is equal to the number of foreground classes that needs to be dilated."""
+        kernel = np.ones((self.dilation_kernel, self.dilation_kernel), dtype=np.uint8)
+        cls = np.unique(mask)
+        #print(cls)
+        #print(len(cls))
+        if len(cls) >= 2:   # if there is foreground
+            #print("len(cls) > 2 ~~~")
+            cls = cls[1:]   # ignore background
+            if isinstance(cls, int):
+                cls = [cls]
             
+            layers = np.zeros((len(cls), mask.shape[0], mask.shape[1]), dtype=np.uint8)
+            #print("layers:{}".format(layers.shape)) # 7,1600,900
+            for i, lb in enumerate(cls):
+                    #print("lb:{}".format(lb))
+                    layers[i][mask[:,:,0] == lb] = 255     # trick to dilate
+                    layers[i] = cv2.erode(layers[i], kernel, iterations=1)
+                    layers[i][np.where(layers[i] == 255)] = lb
+                    
+            
+            outputs = np.zeros_like(mask, dtype=np.uint8)
+            # for j in self.lane_order:   # set it by priority
+            for j in cls:
+                outputs[np.where(layers == j)[1:]] = j
+            return outputs
+        return mask
+    
+
+    def Convert_image_format(self,type=None):
+        
+        # if type == "images" or "image":
+        #     print(self.img_dir)
+        #     img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
+        #elif type == "drivable":
+        print(self.drivable_dir)
+        img_path_list = glob.glob(os.path.join(self.drivable_dir,"*.jpg"))
+        # elif type == "lane":
+        #     print(self.lane_dir)
+        #     img_path_list = glob.glob(os.path.join(self.lane_dir,"*.jpg"))
+
+        for i in range(len(img_path_list)):
+            print(img_path_list[i])
+            im = cv2.imread(img_path_list[i])
+            file,filename = self.parse_path(img_path_list[i])
+            save_im = filename + ".png"
+            save_im_path = os.path.join(self.save_dir,save_im)
+            os.makedirs(self.save_dir,exist_ok=True)
+            cv2.imwrite(save_im_path,im)
+            print("{}:save to .png successful".format(i))
+
+    def Convert_labels(self):
+        print(self.lane_dir)
+        img_path_list = glob.glob(os.path.join(self.lane_dir,"*.png"))
+        
+        for i in range(len(img_path_list)):
+            print(img_path_list[i])
+            mask = cv2.imread(img_path_list[i])
+            out = self.map_segment_labels(mask)
+            file,filename = self.parse_path(img_path_list[i])
+            save_im = filename + ".png"
+            save_im_path = os.path.join(self.save_dir,save_im)
+            os.makedirs(self.save_dir,exist_ok=True)
+            cv2.imwrite(save_im_path,out)
+            print("{}:Convert_labels successful".format(i))
+        return NotImplemented
+    
+    def map_segment_labels(self,mask):
+        """Update the segmentation mask labels by the mapping variable."""
+        out = np.empty((mask.shape), dtype=mask.dtype)
+        for k, v in self.lane_mapping.items():
+            #if isinstance(v, str):
+            #    out[mask == k] = bg_lb
+            #else:
+            out[mask == k] = v
+        return out
+
+    
 
     def CorrectNumberOfImagesAndLablesInDatasets(self):
         img_path_list = glob.glob(os.path.join(self.img_dir,"**","*.jpg"))
@@ -156,7 +311,10 @@ if __name__=="__main__":
     label_parameters = get_args_label()
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
-    label.CorrectNumberOfImagesAndLablesInDatasets()
+    #label.CorrectNumberOfImagesAndLablesInDatasets()
     #label.SplitAllImagesToSpitFolders()
+    #label.Get_datasets_img_path_txt()
+    label.Convert_labels()
+    #label.process_lane_map()
                         
 
