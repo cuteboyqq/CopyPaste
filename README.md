@@ -1,5 +1,7 @@
 # CopyPaste
 
+### [2023-09-30] Updated : Able to CopyPaste 2 lane markings without overlapping 
+
 ![copypaste](https://github.com/cuteboyqq/CopyPaste/assets/58428559/56e484ee-d467-4c9b-b7e2-6d4f76463edb)
 
 ![mask](https://github.com/cuteboyqq/CopyPaste/assets/58428559/45f1884d-bc75-4398-833d-7ffd838dd1cc)
