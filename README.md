@@ -1,6 +1,6 @@
 # CopyPaste
 
-### [2023-09-30] Updated : Able to CopyPaste 2 lane marking without overlapping
+### [2023-09-30] Updated : Able to CopyPaste >=1 lane marking without overlapping
 
 
 
