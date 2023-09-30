@@ -7,44 +7,70 @@ import glob
 from engine.datasets import BaseDatasets
 
 class LaneMarkingDataset(BaseDatasets):
-    # def __init__(self,args):
-    #     super.__init__(self)
-    #     self.label = 11 #Stop sign label
-    #     self.method = args.method
-    
-
+  
     def Get_ROI_Label(self):
     
         return self.label
 
-    # def Get_Update_Vanish_Y(self):
-    #     im_h = self.im.shape[0]
-    #     vanish_y = 0
-    #     x = int(self.im.shape[1]/2.0)
-    #     while(self.dri[vanish_y][x][0]==0):
-    #         if vanish_y+1< (im_h-1):
-    #             vanish_y+=1
-    #         else:
-    #             break
-
-    #     if vanish_y>= int(im_h * self.carhood_ratio):
-    #         vanish_y = int(im_h * self.carhood_ratio) - 100
-            
-      
-    #     self.vanish_y = vanish_y
-
-    #     return vanish_y
-
-
-    def Get_Possible_ROI_Position_Area(self):
+    def Get_Possible_ROI_Position_Area(self,creteria = 1):
         ## binary mask of enable/disable position mask
         mask = np.zeros(self.im.shape, dtype=np.uint8)
         mask[self.dri>0]=255
         mask[self.dri==0]=0
+
+        ## Show Mask image
+        show_mask = False
+        if show_mask:
+            self.Show_Image(mask,name="ori-mask",data_type="img",time=1000)
+
+        ## Not overlapped with Lane marking bounding boxes
+        if self.save_label_path is not None:
+            print(self.save_label_path)
+            #input()
+            if os.path.exists(self.save_label_path):
+                print("self.save_label_path exists")
+                with open(self.save_label_path,'r') as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        line_list = line.split(" ")
+                        #print(line_list)
+                        label = line_list[0]
+                        #print(label)
+                        x = int(float(line_list[1])*self.im.shape[1])
+                        y = int(float(line_list[2])*self.im.shape[0])
+                        w = int(float(line_list[3])*self.im.shape[1])
+                        h = int(float(line_list[4])*self.im.shape[0])
+                        if int(label) == 11: ## label Lane marking
+                            print("find lane marking label {},{},{},{}".format(x,y,w,h))
+                            if creteria==1:
+                                if y-int(h/0.5) >= 1 and y+int(h/0.5) <= self.im.shape[0] - 1:
+                                    mask[y-int(h/0.5):y+int(h/0.5),:] = (0,0,0)
+                                elif y-int(h/1.0) >= 1 and y+int(h/1.0) <= self.im.shape[0] - 1:
+                                    mask[y-int(h/1.0):y+int(h/1.0),:] = (0,0,0)
+                                else:
+                                    mask[y-int(h/2.0):y+int(h/2.0),:] = (0,0,0)
+                            elif creteria==2:
+                                if x-int(w/0.5) >= 1 and x+int(w/0.5) <= self.im.shape[1] - 1:
+                                    mask[:,x-int(h/0.5):x+int(h/0.5)] = (0,0,0)
+                                elif x-int(w/1.0) >= 1 and x+int(w/1.0) <= self.im.shape[1] - 1:
+                                    mask[:,x-int(h/1.0):x+int(h/1.0)] = (0,0,0)
+                                else:
+                                    mask[:,x-int(w/2.0):x+int(w/2.0)] = (0,0,0)
+                        else:
+                            mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = (0,0,0)
+            else:
+                print("self.save_label_path not exists")
+                input()
+
+        ## Show Mask image
+        if show_mask:
+            self.Show_Image(mask,name="new-mask",data_type="img",time=1000)
+
         return mask
 
 
     def Get_ROI_XY_In_Image(self,vanish_y,carhood_ratio):
+        GET_XY=True
         #self.vanish_y = self.Get_Update_Vanish_Y()
         print("self.vanish_y:{}".format(self.vanish_y))
         #input()
@@ -59,11 +85,13 @@ class LaneMarkingDataset(BaseDatasets):
         # else:
         #     y = self.vanish_y
 
-        ## Stop should put at non-drivable area
+        ## Lane marking should put at drivable area
+        ## mask[y][x][0] = 0 , background
+        ## mask[y][x][0] != 0 , drivable area
         cnt = 1
         while(mask[y][x][0]==0): # Exist while when (x,y) is in drivable area
             print("mask[y][x][0]==0 re-assign XY~~~~")
-            ra = random.randint(3,8)
+            ra = random.randint(3,10)
             x = random.randint(int(self.im.shape[1]*float(2/7)) ,int(self.im.shape[1]*float(5/7)))
             y = random.randint(vanish_y,int(self.im.shape[0]*carhood_ratio)-int(range*2/ra))
             # if self.vanish_y+100 < self.im.shape[0] - 1:
@@ -71,14 +99,25 @@ class LaneMarkingDataset(BaseDatasets):
             # else:
             #     y = self.vanish_y
             cnt+=1
-            if cnt==100:
+            #if cnt==200:
+            #    mask = self.Get_Possible_ROI_Position_Area(creteria=2)
+            
+            if cnt==400:
+                GET_XY=False
                 break
             
         self.roi_x  = x
         self.roi_y  = y
         print("self.roi_x :{}".format(self.roi_x))
         print("self.roi_y :{}".format(self.roi_y))
-        return (x,y)
+
+        show_center_xy_img=False
+        if show_center_xy_img:
+            im_xy = cv2.circle(mask, (x,y), radius=4, color=(0, 0, 255), thickness=-1)
+            cv2.imshow("xy",im_xy)
+            cv2.waitKey(1000)
+            cv2.destroyAllWindows()
+        return x,y,GET_XY
         return NotImplementedError
 
     def Get_ROI_WH_In_Image(self,roi,roi_mask, dri_path):
@@ -131,7 +170,7 @@ class LaneMarkingDataset(BaseDatasets):
         # ratio = float(self.roi_w/roi.shape[1])
         # self.roi_h = int(roi.shape[0]*ratio)
 
-        ##Check roi_w, roi_h
+        ## Check roi_w, roi_h
         if self.roi_h >= int(self.im.shape[0] * 0.30):
             self.roi_h = int(self.im.shape[0] * 0.30)
             ratio = float(self.roi_h/roi.shape[0])
@@ -182,6 +221,16 @@ class LaneMarkingDataset(BaseDatasets):
         print("after update x_c,y_c")
         print("x_c = {}".format(x_c))
         print("y_c = {}".format(y_c))
+
+        
+
+        show_center_xy_img=False
+        if show_center_xy_img:
+            im_xy = cv2.circle(self.im, (x_c,y_c), radius=4, color=(0, 0, 255), thickness=-1)
+            cv2.imshow("xy_after",im_xy)
+            cv2.waitKey(1000)
+            cv2.destroyAllWindows()
+
         return x_c, y_c
 
     def Get_ROI_Label(self):

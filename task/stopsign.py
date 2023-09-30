@@ -16,11 +16,18 @@ class StopSignDataset(BaseDatasets):
     
         return self.label
 
+
     def Get_Possible_ROI_Position_Area(self):
         ## binary mask of enable/disable position mask
         mask = np.zeros(self.im.shape, dtype=np.uint8)
         mask[self.dri>0]=255
         mask[self.dri==0]=0
+
+        ## Show Mask image
+        show_mask = False
+        if show_mask:
+            self.Show_Image(mask,name="ori-mask",data_type="img")
+
 
         ## not overlapped with other bounding box
         if os.path.exists(self.label_path):
@@ -35,11 +42,16 @@ class StopSignDataset(BaseDatasets):
                     h = int(float(line_list[4])*self.im.shape[0])
                     
                     mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = (255,255,255)
+        
+        ## Show Mask image
+        if show_mask:
+            self.Show_Image(mask,name="new-mask",data_type="img")
 
         return mask
 
 
     def Get_ROI_XY_In_Image(self,vanish_y,carhood_ratio):
+        GET_XY=True
         mask = self.Get_Possible_ROI_Position_Area()
         
         ## initial random (x,y)
@@ -54,10 +66,11 @@ class StopSignDataset(BaseDatasets):
             y = random.randint(vanish_y - 100 ,int(self.im.shape[0]*carhood_ratio))
             cnt+=1
             if cnt==100:
+                GET_XY=False
                 break
         self.roi_x  = x
         self.roi_y  = y
-        return (x,y)
+        return x,y,GET_XY
         return NotImplementedError
 
     
