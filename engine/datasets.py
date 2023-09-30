@@ -315,6 +315,8 @@ class BaseDatasets:
         ## Get the coordinate (x,y) and width, height , label of ROI that we want to copy-paset into image
         #  
         l,x,y,w,h,roi,roi_mask,get_xy = self.Get_ROI_lxywh_In_Image(roi,roi_mask,vanish_y,carhood_ratio, self.dri_path)
+
+        ## Does get the right place of X Y 
         if get_xy:
             print("{},{},{},{},{}".format(l,x,y,w,h))
             print("roi:{}".format(roi.shape))
@@ -326,7 +328,7 @@ class BaseDatasets:
             if os.path.exists(self.label_path):
                 
 
-                ## Save coptpasted image
+                ## Save coptpasted image,set to True
                 if True:
                     IS_FAILED=False
                     if self.method=="both":
@@ -345,7 +347,7 @@ class BaseDatasets:
                         print("roi.shape:{}".format(roi.shape))
                         print("roi.dtype:{}".format(roi.dtype))
                         try:
-                            output = cv2.seamlessClone(roi, self.im, mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
+                            self.im = cv2.seamlessClone(roi, self.im, mask, center, cv2.MIXED_CLONE)   #MIXED_CLONE
                         except:
                             IS_FAILED=True
                             pass
@@ -383,7 +385,7 @@ class BaseDatasets:
                     if IS_FAILED==False:
                         if self.method == "opencv":
                             print("save image")
-                            cv2.imwrite(save_img_path,output)
+                            cv2.imwrite(save_img_path,self.im)
                         else:
                             print("mask method save image")
                             cv2.imwrite(save_img_path,self.im)
