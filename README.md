@@ -1,28 +1,21 @@
 # CopyPaste
 
-### [2023-09-30] Updated : Able to CopyPaste 2 lane markings without overlapping 
+### [2023-09-30] Updated : Able to CopyPaste 2 lane m![00618cec-ef92ac05](https://github.com/cuteboyqq/CopyPaste/assets/58428559/911d5ce5-9f9b-4c35-ba6e-c1faa0ffa031)![00714cd3-48d6b290](https://github.com/cuteboyqq/CopyPaste/assets/58428559/dab5c922-2ab3-42e2-ba83-06d416284f3d)
+![00699de6-58847872](https://github.com/cuteboyqq/CopyPaste/assets/58428559/6d72d20f-f5ec-4e7e-8f1c-16a76d92779e)
+![00690c26-e4bbbd72](https://github.com/cuteboyqq/CopyPaste/assets/58428559/aa33a022-9bfc-4d2e-bde7-92dfc5b6fe16)
+overlapping 
 
-![copypaste](https://github.com/cuteboyqq/CopyPaste/assets/58428559/56e484ee-d467-4c9b-b7e2-6d4f76463edb)
-
-![mask](https://github.com/cuteboyqq/CopyPaste/assets/58428559/45f1884d-bc75-4398-833d-7ffd838dd1cc)
-
-
-![0a0eaeaf-9ad0c6dd](https://github.com/cuteboyqq/CopyPaste/assets/58428559/29a54ec8-c528-46cc-8f34-c931dbe771ea)
-
-![0aa4bc86-1e9bb591](https://github.com/cuteboyqq/CopyPaste/assets/58428559/fab81f54-6d43-4582-b73f-356175b51dc6)
-
-
-![8a783082-e46360fb](https://github.com/cuteboyqq/CopyPaste/assets/58428559/ba5673f3-277e-4ecb-9fb8-a21e798e9545)
-
-
-![08ad7534-5dd9b225](https://github.com/cuteboyqq/CopyPaste/assets/58428559/2b7da934-3491-42c1-954b-c196b80b1d0d)
-![8ad2994f-4e8f61a8](https://github.com/cuteboyqq/CopyPaste/assets/58428559/0d9797f5-5de3-47c7-943a-9ebf5511f208)
-![8ad8eaa2-a5491793](https://github.com/cuteboyqq/CopyPaste/assets/58428559/32e8d992-fec3-4e60-b30a-a90703404cb4)
-![8ad5ae2d-e092795e](https://github.com/cuteboyqq/CopyPaste/assets/58428559/a7d908a2-afeb-44d2-9c8b-e47e225f77c3)
-![8ad1a8ff-f23c9a92](https://github.com/cuteboyqq/CopyPaste/assets/58428559/fed6b960-8729-49ec-8197-d2a1697eccf0)
-![8ad1a8ff-84595d9a](https://github.com/cuteboyqq/CopyPaste/assets/58428559/139b2b86-5d0d-432b-99e6-27cc1a6c9e38)
-![8ad0b480-103c3306](https://github.com/cuteboyqq/CopyPaste/assets/58428559/a72eeab8-24d3-449a-9640-840e5d61064a)
-![8acd2724-f82b98f5](https://github.com/cuteboyqq/CopyPaste/assets/58428559/3e01d02d-078d-40b8-9307-8c7bd55d9729)
-![8acd2724-106f86e2](https://github.com/cuteboyqq/CopyPaste/assets/58428559/756de252-fa7f-4eee-acaf-9fb86c17585b)
-![8ac05616-170bd343](https://github.com/cuteboyqq/CopyPaste/assets/58428559/7de4d582-0c3e-4324-a4a8-21080d41f2f9)
-![08ac23b4-2031c61b](https://github.com/cuteboyqq/CopyPaste/assets/58428559/b2bc5003-6554-403d-a48e-0033caf4f03f)
+![00618cec-a7f7e470](https://github.com/cuteboyqq/CopyPaste/assets/58428559/674d58fa-3a5d-448f-989d-1504c93614e9)
+![00618cec-3bc5573e](https://github.com/cuteboyqq/CopyPaste/assets/58428559/9d71b3ee-fe0d-4aa1-a13d-fc6c3d77bd0d)
+![00589f25-4cf2b9e0](https://github.com/cuteboyqq/CopyPaste/assets/58428559/603bfb02-11f8-4445-bc0a-1091589c6d41)
+![00516b75-7ac91661](https://github.com/cuteboyqq/CopyPaste/assets/58428559/9bc5fea0-0fe6-4055-a637-ed3c99234829)
+![00488b40-0a8cf1a0](https://github.com/cuteboyqq/CopyPaste/assets/58428559/ac2c0add-7936-4bb6-9663-e7df78d3e500)
+![00423ac5-1fa7ff43](https://github.com/cuteboyqq/CopyPaste/assets/58428559/eef6fb64-de26-4062-939a-3a17bbab666c)
+![00417c23-220bbc98](https://github.com/cuteboyqq/CopyPaste/assets/58428559/4dbe01b0-65d5-4326-8349-c64d35fd434f)
+![00391a82-d1428e56](https://github.com/cuteboyqq/CopyPaste/assets/58428559/fb34f67f-280d-4cae-9d79-7df8d14a5b09)
+![00391a82-8be5b76d](https://github.com/cuteboyqq/CopyPaste/assets/58428559/32df6bd8-693e-47e4-9dc1-5b5740802321)
+![00322f82-286ab9b3](https://github.com/cuteboyqq/CopyPaste/assets/58428559/6b1309b5-e9a5-41fc-ae9a-8329338ef50a)
+![00313a01-b53a2998](https://github.com/cuteboyqq/CopyPaste/assets/58428559/304aa369-684e-4aee-9c62-af44455abc14)
+![00313a01-62156032](https://github.com/cuteboyqq/CopyPaste/assets/58428559/2bf149fe-85d4-437d-895d-a519b63e467c)
+![00313a01-725ddf3a](https://github.com/cuteboyqq/CopyPaste/assets/58428559/55ed84fb-e079-4f9b-8473-b9a312a0703f)
+![00787a90-b350f376](https://github.com/cuteboyqq/CopyPaste/assets/58428559/ef670267-0406-4d77-a43f-258e43795ca7)
