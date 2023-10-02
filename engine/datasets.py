@@ -441,6 +441,16 @@ class BaseDatasets:
 
                 return COPY_ORI_TXT_DONE
         else:
+            ## Save image
+            save_im_dir = os.path.join(self.save_dir,"images")
+            os.makedirs(save_im_dir,exist_ok=True)
+            img_file = self.im_path.split(os.sep)[-1]
+            save_img_path = os.path.join(save_im_dir,img_file)
+           
+            print("save image")
+            cv2.imwrite(save_img_path,self.im)
+               
+
             if self.save_txt:
                     print("save txt")
                  
