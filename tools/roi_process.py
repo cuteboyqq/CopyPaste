@@ -95,7 +95,34 @@ class ROIProcess:
                 shutil.copy(mask_path,save_mask_dir)
                 print("{}: {} copy succesful!".format(c,file))
                 c+=1
-                
+    
+    def Rename_ROIs(self,name="Kaohsiung_Night_"):
+        roi_path_list = glob.glob(os.path.join(self.roi_dir,"*.jpg"))
+        print(roi_path_list)
+        c = 1
+        for roi_path in roi_path_list:
+            file, file_name, path_dir,path_dir_dir = self.parse_path_2(roi_path)
+            print(path_dir_dir)
+            mask = file
+            mask_path = os.path.join(self.mask_dir,mask)
+            print(mask_path)
+
+            new_file = name + file_name + ".jpg"
+
+            save_roi_dir = os.path.join(self.save_dir,"roi")
+            os.makedirs(save_roi_dir,exist_ok=True)
+            
+            save_roi_path = os.path.join(save_roi_dir,new_file)
+
+            shutil.copy(roi_path,save_roi_path)
+
+            save_mask_dir = os.path.join(self.save_dir,"mask")
+            os.makedirs(save_mask_dir,exist_ok=True)
+            
+            save_mask_path = os.path.join(save_mask_dir,new_file)
+
+            shutil.copy(mask_path,save_mask_path)
+
     def FilterImg(self,
               mask=True,
               stop_sign=False,
@@ -239,6 +266,8 @@ class ROIProcess:
 if __name__=="__main__":
     args = get_args_roi()
     roi = ROIProcess(args)
-    roi.ParseNuImageROIDataset()
+    #roi.ParseNuImageROIDataset()
+
+    roi.Rename_ROIs(name="Kaohsiung_Night_")
     #roi.GetCorrespondingMasks()
 
