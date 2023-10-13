@@ -1,6 +1,6 @@
 import sys
 sys.path.append('..')
-from utils.config import get_args_label
+
 import glob
 import os
 import shutil
@@ -107,7 +107,7 @@ class LabelDatasets:
         if len(val_img_path_list)==0:
             val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.png"))
 
-        train_f = open("train_new_2023-09-26.txt","a")
+        train_f = open("train_new_2023-10-12.txt","a")
         for i in range(len(train_img_path_list)):
             local_path = self.parse_path_2(train_img_path_list[i])
             print("train {}:{}".format(i,local_path))
@@ -129,7 +129,7 @@ class LabelDatasets:
     ## func: process_lane_map
     ## Erode the maps
     def process_lane_map(self):
-        lane_map_path_list = glob.glob(os.path.join(self.lane_dir,self.process_type,"train","*.jpg"))
+        lane_map_path_list = glob.glob(os.path.join(self.lane_dir,self.process_type,"*.png"))
         for i in range(len(lane_map_path_list)):
             print(lane_map_path_list[i])
             print(len(lane_map_path_list))
@@ -165,7 +165,7 @@ class LabelDatasets:
             for i, lb in enumerate(cls):
                     #print("lb:{}".format(lb))
                     layers[i][mask[:,:,0] == lb] = 255     # trick to dilate
-                    layers[i] = cv2.erode(layers[i], kernel, iterations=1)
+                    layers[i] = cv2.erode(layers[i], kernel, iterations=2)
                     layers[i][np.where(layers[i] == 255)] = lb
                     
             
@@ -304,7 +304,43 @@ class LabelDatasets:
                 print("copy error !")
                 pass
 
+def get_args_label():
+    import argparse
+    parser = argparse.ArgumentParser()
+    ##   BDD100k datasets directory
+    # parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/BDD100K-ori/images/100k/train")
+    # parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/BDD100K-ori/labels/detection/train")
+    # parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
+    #                     default="/home/ali/Projects/datasets/BDD100K-ori/labels/drivable/colormaps/train")
+    
+    # parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
+    #                     default="/home/ali/Projects/datasets/BDD100K-ori/labels/lane/colormaps/train")
 
+    # ## Save parameters
+    # parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/re-label/train")
+    # parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
+    # parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
+    
+    # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
+
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data_0.8_nuImage/images/100k")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimages-dataset/labels/detection/train")
+    parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
+                        default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
+    
+    parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
+                        default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
+
+    ## Save parameters
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/nuImages-convert-label-2023-10-13")
+    parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
+    parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
+    
+    parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
+
+
+    parser.add_argument('-processtype','--process-type',help='proxess type',default="colormap")
+    return parser.parse_args()
 
 if __name__=="__main__":
 
@@ -313,6 +349,7 @@ if __name__=="__main__":
     #label.RemoveLabelsInLabelTXT()
     #label.CorrectNumberOfImagesAndLablesInDatasets()
     #label.SplitAllImagesToSpitFolders()
+    #label.Get_datasets_img_path_txt()
     #label.Get_datasets_img_path_txt()
     label.Convert_labels()
     #label.process_lane_map()

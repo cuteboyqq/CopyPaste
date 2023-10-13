@@ -4,7 +4,7 @@ import glob
 import shutil
 import os
 import cv2
-from utils.config import get_args_roi
+#from utils.config import get_args_roi
 import numpy as np
 
 class ROIProcess:
@@ -97,6 +97,8 @@ class ROIProcess:
                 c+=1
     
     def Rename_ROIs(self,name="Kaohsiung_Night_"):
+        ## need self.roi_dir
+        ##      self.save_dir
         roi_path_list = glob.glob(os.path.join(self.roi_dir,"*.jpg"))
         print(roi_path_list)
         c = 1
@@ -123,6 +125,9 @@ class ROIProcess:
 
             shutil.copy(mask_path,save_mask_path)
 
+
+    ## Need self.save_dir
+    ##      self.roi_dir
     def FilterImg(self,
               mask=True,
               stop_sign=False,
@@ -131,7 +136,7 @@ class ROIProcess:
         os.makedirs(os.path.join(self.save_dir,"roi"),exist_ok=True)
         os.makedirs(os.path.join(self.save_dir,"mask"),exist_ok=True)
         c = 1
-        img_path_list = glob.glob(os.path.join(self.img_dir,'*.jpg'))
+        img_path_list = glob.glob(os.path.join(self.roi_dir,'*.jpg'))
         #print(img_path_list)
         for img_path in img_path_list:
             file, file_name,path_dir,path_dir_dir = self.parse_path_2(img_path)
@@ -228,13 +233,17 @@ class ROIProcess:
                         cv2.imwrite(roi_dir+"/"+file,img)
                         print("save new img")
                     else:
-                        if GET_BEAUTIFUL_MASK:
-                            img[img_binary>20] = img[img_binary>20] 
-                            img[img_binary<=20] = img[img_binary<=20]  
-                            roi_dir = os.path.join(self.save_dir,"roi")
-                            #if GET_BEAUTIFUL_MASK:
-                            cv2.imwrite(roi_dir+"/"+file,img)
-                            print("save new img")
+                        #if GET_BEAUTIFUL_MASK:
+                        img[img_binary>20] = img[img_binary>20] 
+                        img[img_binary<=20] = img[img_binary<=20]  
+                        roi_dir = os.path.join(self.save_dir,"roi")
+                        #if GET_BEAUTIFUL_MASK:
+                        cv2.imwrite(roi_dir+"/"+file,img)
+                        print("save new img")
+
+                        mask_dir = os.path.join(self.save_dir,"mask")
+                        cv2.imwrite(mask_dir+"/"+file,img_binary)
+                
                     #=====================================================================================
                     #Because it is already the ROI image, so l do not need use contour method to get ROI
                     #======================================================================================
@@ -263,11 +272,28 @@ class ROIProcess:
 
         return
     
+def get_args_roi():
+    import argparse
+    parser = argparse.ArgumentParser()
+    ##   BDD100k datasets directory
+    parser.add_argument('-datadir','--data-dir',help='data dir',default="/home/ali/Projects/datasets/nuimages/roi_train")
+    parser.add_argument('-savedir','--save-dir',help='save dir',default="./OP_TA_lanemarking_roi_New")
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="/home/ali/Projects/datasets/roi_backup/landmark_roi/merge_openlanev2_taiwan/roi")
+    parser.add_argument('-maskdir','--mask-dir',help='mask dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/NU_TA_roi_rename/mask")
+    return parser.parse_args()
+
+
+    
 if __name__=="__main__":
     args = get_args_roi()
     roi = ROIProcess(args)
     #roi.ParseNuImageROIDataset()
 
-    roi.Rename_ROIs(name="Kaohsiung_Night_")
+    #roi.Rename_ROIs(name="Kaohsiung_Night_")
+    roi.FilterImg(mask=True,
+              stop_sign=False,
+              equalize=False,
+              roi_th=100)
     #roi.GetCorrespondingMasks()
+    # roi.Rename_ROIs(name="nuimg_taiwan_")
 

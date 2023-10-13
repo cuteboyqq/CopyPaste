@@ -302,8 +302,8 @@ def get_args():
     parser = argparse.ArgumentParser()
     
     '''============================input img/output img parameters setting================================='''
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default='../datasets/ROI/lanemarking/Tainan_LaneMarking_ROI_New')
-    parser.add_argument('-savedir','--save-dir',help='save aug-img dir',default='../datasets/ROI/lanemarking/Tainan_LaneMarking_ROI_New_AUG')
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default='../datasets/ROI/lanemarking/train')
+    parser.add_argument('-savedir','--save-dir',help='save aug-img dir',default='../datasets/ROI/lanemarking/roi_aug')
     
     '''===================blur parameter settings=========================================================='''
     parser.add_argument('-blur','--blur',help='enable blur augment',action='store_true')
