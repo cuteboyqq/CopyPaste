@@ -303,6 +303,93 @@ class LabelDatasets:
             except:
                 print("copy error !")
                 pass
+    
+    def Get_Label_Path(self,im_path):
+        '''
+        the dataset format is  images/100k/train
+                                images/100k/val
+                                images/100k/test
+        input : image path
+        output : label path
+        '''
+        im_dir = os.path.dirname(im_path)
+        label_dir = "/labels/detection".join(im_dir.split("/images"))
+        im = os.path.basename(im_path)
+        label = im.split(".")[0] + ".txt"
+        label_path = os.path.join(label_dir,label)
+
+
+        dri_mask_dir = "/labels/drivable/masks".join(im_dir.split("/images"))
+        dri_mask = im.split(".")[0] + ".png"
+        dri_mask_path = os.path.join(dri_mask_dir,dri_mask)
+
+
+        dri_colormap_dir = "/labels/drivable/colormaps".join(im_dir.split("/images"))
+        dri_colormap = im.split(".")[0] + ".png"
+        dri_colormap_path = os.path.join(dri_colormap_dir,dri_colormap)
+
+
+        lane_mask_dir = "/labels/lane/masks".join(im_dir.split("/images"))
+        lane_mask = im.split(".")[0] + ".png"
+        lane_mask_path = os.path.join(lane_mask_dir,lane_mask)
+
+
+        lane_colormap_dir = "/labels/lane/colormaps".join(im_dir.split("/images"))
+        lane_colormap = im.split(".")[0] + ".png"
+        lane_colormap_path = os.path.join(lane_colormap_dir,lane_colormap)
+
+        return label_path,dri_mask_path,dri_colormap_path,lane_mask_path,lane_colormap_path,label,dri_mask,lane_mask
+
+
+    def Get_Pedestrain_Dataset(self):
+        im_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
+        # print(im_path_list)
+        c = 1
+        f_p = 1
+        for i in range(len(im_path_list)):
+            label_path,dri_mask_path,dri_colormap_path,lane_mask_path,lane_colormap_path,label,dri_mask,lane_mask = self.Get_Label_Path(im_path_list[i])
+            # print("{}:{}".format(c,label_path))
+            # print("{}:{}".format(c,dri_mask_path))
+            # print("{}:{}".format(c,lane_mask_path))
+            find_wanted_label = False
+            if os.path.exists(label_path):
+                with open(label_path,"r") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        # print(line)
+                        la_str = line.split(" ")[0]
+                        if la_str=="0" or la_str=="1":
+                            find_wanted_label = True
+            
+            if find_wanted_label:
+                save_im_dir = os.path.join(self.save_dir,"images","train")
+                os.makedirs(save_im_dir,exist_ok=True)
+                shutil.copy(im_path_list[i],save_im_dir)
+
+                save_label_dir = os.path.join(self.save_dir,"labels","detection","train")
+                os.makedirs(save_label_dir,exist_ok=True)
+                shutil.copy(label_path,save_label_dir)
+
+                save_dri_mask_dir = os.path.join(self.save_dir,"labels","drivable","masks","train")
+                os.makedirs(save_dri_mask_dir,exist_ok=True)
+                shutil.copy(dri_mask_path,save_dri_mask_dir)
+
+                save_dri_colormap_dir = os.path.join(self.save_dir,"labels","drivable","colormaps","train")
+                os.makedirs(save_dri_colormap_dir,exist_ok=True)
+                shutil.copy(dri_colormap_path,save_dri_colormap_dir)
+
+
+                save_lane_mask_dir = os.path.join(self.save_dir,"labels","lane","masks","train")
+                os.makedirs(save_lane_mask_dir,exist_ok=True)
+                shutil.copy(lane_mask_path,save_lane_mask_dir)
+
+                save_lane_colormaps_dir = os.path.join(self.save_dir,"labels","lane","colormaps","train")
+                os.makedirs(save_lane_colormaps_dir,exist_ok=True)
+                shutil.copy(lane_colormap_path,save_lane_colormaps_dir)
+
+                print("{}:saved image including pedestrain successfully".format(f_p))
+                f_p+=1
+            c+=1
 
 def get_args_label():
     import argparse
@@ -323,8 +410,8 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data_0.8_nuImage/images/100k")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimages-dataset/labels/detection/train")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/images/train")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
     
@@ -332,7 +419,7 @@ def get_args_label():
                         default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/nuImages-convert-label-2023-10-13")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/nuImage_data_2023-10-16")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -351,7 +438,8 @@ if __name__=="__main__":
     #label.SplitAllImagesToSpitFolders()
     #label.Get_datasets_img_path_txt()
     #label.Get_datasets_img_path_txt()
-    label.Convert_labels()
+    #label.Convert_labels()
+    label.Get_Pedestrain_Dataset()
     #label.process_lane_map()
                         
 
