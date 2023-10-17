@@ -101,6 +101,7 @@ class LabelDatasets:
     def Get_datasets_img_path_txt(self):
 
         train_img_path_list = glob.glob(os.path.join(self.img_dir,"train","*.jpg"))
+        #print(train_img_path_list)
         if len(train_img_path_list)==0:
             train_img_path_list = glob.glob(os.path.join(self.img_dir,"train","*.png"))
         val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.jpg"))
@@ -438,7 +439,7 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data/images/100k/train")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data_pedestrain_2023-10-17/images/100k")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
@@ -467,8 +468,8 @@ if __name__=="__main__":
     #label.Get_datasets_img_path_txt()
     #label.Get_datasets_img_path_txt()
     #label.Convert_labels()
-    label.Get_Pedestrain_Dataset()
-    #label.Get_datasets_img_path_txt()
+    #label.Get_Pedestrain_Dataset()
+    label.Get_datasets_img_path_txt()
     #label.process_lane_map()
                         
 
