@@ -360,13 +360,14 @@ class LabelDatasets:
         c = 1
         f_p = 1
         for i in range(len(im_path_list)):
+            label_exist = False
             label_path,dri_mask_path,dri_colormap_path,lane_mask_path,lane_colormap_path,label,dri_mask,lane_mask = self.Get_Label_Path(im_path_list[i])
             # print("{}:{}".format(c,label_path))
             # print("{}:{}".format(c,dri_mask_path))
             # print("{}:{}".format(c,lane_mask_path))
             find_wanted_label = False
             if os.path.exists(label_path):
-                print(label_path)
+                # print(label_path)
                 with open(label_path,"r") as f:
                     lines = f.readlines()
                     for line in lines:
@@ -382,26 +383,39 @@ class LabelDatasets:
 
                 save_label_dir = os.path.join(self.save_dir,"labels","detection","train")
                 os.makedirs(save_label_dir,exist_ok=True)
-                shutil.copy(label_path,save_label_dir)
-
+                if not os.path.exists(os.path.join(save_label_dir,label)):
+                    shutil.copy(label_path,save_label_dir)
+                else:
+                    label_exist=True
                 save_dri_mask_dir = os.path.join(self.save_dir,"labels","drivable","masks","train")
                 os.makedirs(save_dri_mask_dir,exist_ok=True)
-                shutil.copy(dri_mask_path,save_dri_mask_dir)
-
+                if not os.path.exists(os.path.join(save_dri_mask_dir,dri_mask)):
+                    shutil.copy(dri_mask_path,save_dri_mask_dir)
+                else:
+                    label_exist=True
                 save_dri_colormap_dir = os.path.join(self.save_dir,"labels","drivable","colormaps","train")
                 os.makedirs(save_dri_colormap_dir,exist_ok=True)
-                shutil.copy(dri_colormap_path,save_dri_colormap_dir)
-
+                if not os.path.exists(os.path.join(save_dri_colormap_dir,dri_mask)):
+                    shutil.copy(dri_colormap_path,save_dri_colormap_dir)
+                else:
+                    label_exist=True
 
                 save_lane_mask_dir = os.path.join(self.save_dir,"labels","lane","masks","train")
                 os.makedirs(save_lane_mask_dir,exist_ok=True)
-                shutil.copy(lane_mask_path,save_lane_mask_dir)
-
+                if not os.path.exists(os.path.join(save_lane_mask_dir,lane_mask)):
+                    shutil.copy(lane_mask_path,save_lane_mask_dir)
+                else:
+                    label_exist=True
                 save_lane_colormaps_dir = os.path.join(self.save_dir,"labels","lane","colormaps","train")
                 os.makedirs(save_lane_colormaps_dir,exist_ok=True)
-                shutil.copy(lane_colormap_path,save_lane_colormaps_dir)
-
+                if not os.path.exists(os.path.join(save_lane_colormaps_dir,lane_mask)):
+                    shutil.copy(lane_colormap_path,save_lane_colormaps_dir)
+                else:
+                    label_exist=True
                 print("{}:saved image including pedestrain successfully".format(f_p))
+
+                if label_exist:
+                    print("label_exist = {},pass~~~~~~".format(label_exist))
                 f_p+=1
             c+=1
 
