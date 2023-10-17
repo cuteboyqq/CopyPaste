@@ -107,7 +107,7 @@ class LabelDatasets:
         if len(val_img_path_list)==0:
             val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.png"))
 
-        train_f = open("train_new_2023-10-12.txt","a")
+        train_f = open("train_new_2023-10-16.txt","a")
         for i in range(len(train_img_path_list)):
             local_path = self.parse_path_2(train_img_path_list[i])
             print("train {}:{}".format(i,local_path))
@@ -117,7 +117,7 @@ class LabelDatasets:
         train_f.close()
 
 
-        val_f = open("val_new.txt","a")
+        val_f = open("val_new_2023-10-16.txt","a")
         for i in range(len(val_img_path_list)):
             local_path = self.parse_path_2(val_img_path_list[i])
             print("val {}:{}".format(i,local_path))
@@ -311,30 +311,43 @@ class LabelDatasets:
                                 images/100k/test
         input : image path
         output : label path
+        
         '''
+        USE_BDD100K_DATA = True
+
         im_dir = os.path.dirname(im_path)
         label_dir = "/labels/detection".join(im_dir.split("/images"))
+        if USE_BDD100K_DATA:
+            label_dir = "".join(label_dir.split("/100k"))
         im = os.path.basename(im_path)
         label = im.split(".")[0] + ".txt"
         label_path = os.path.join(label_dir,label)
 
 
         dri_mask_dir = "/labels/drivable/masks".join(im_dir.split("/images"))
+        if USE_BDD100K_DATA:
+            dri_mask_dir = "".join(dri_mask_dir.split("/100k"))
         dri_mask = im.split(".")[0] + ".png"
         dri_mask_path = os.path.join(dri_mask_dir,dri_mask)
 
 
         dri_colormap_dir = "/labels/drivable/colormaps".join(im_dir.split("/images"))
+        if USE_BDD100K_DATA:
+            dri_colormap_dir = "".join(dri_colormap_dir.split("/100k"))
         dri_colormap = im.split(".")[0] + ".png"
         dri_colormap_path = os.path.join(dri_colormap_dir,dri_colormap)
 
 
         lane_mask_dir = "/labels/lane/masks".join(im_dir.split("/images"))
+        if USE_BDD100K_DATA:
+            lane_mask_dir = "".join(lane_mask_dir.split("/100k"))
         lane_mask = im.split(".")[0] + ".png"
         lane_mask_path = os.path.join(lane_mask_dir,lane_mask)
 
 
         lane_colormap_dir = "/labels/lane/colormaps".join(im_dir.split("/images"))
+        if USE_BDD100K_DATA:
+            lane_colormap_dir = "".join(lane_colormap_dir.split("/100k"))
         lane_colormap = im.split(".")[0] + ".png"
         lane_colormap_path = os.path.join(lane_colormap_dir,lane_colormap)
 
@@ -353,6 +366,7 @@ class LabelDatasets:
             # print("{}:{}".format(c,lane_mask_path))
             find_wanted_label = False
             if os.path.exists(label_path):
+                print(label_path)
                 with open(label_path,"r") as f:
                     lines = f.readlines()
                     for line in lines:
@@ -410,7 +424,7 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/images/train")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data/images/100k/train")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
@@ -419,7 +433,7 @@ def get_args_label():
                         default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/nuImage_data_2023-10-16")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/bdd100k_data_pedestrain_2023-10-17")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -440,6 +454,7 @@ if __name__=="__main__":
     #label.Get_datasets_img_path_txt()
     #label.Convert_labels()
     label.Get_Pedestrain_Dataset()
+    #label.Get_datasets_img_path_txt()
     #label.process_lane_map()
                         
 
