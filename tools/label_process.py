@@ -78,7 +78,16 @@ class LabelDatasets:
             f_new.close()
 
     def SplitAllImagesToSpitFolders(self):
+        '''
+        func:SplitAllImagesToSpitFolders
+        input:
+            self.img_dir
+            self.save_dir
+        output:
+            image in split folders
+        '''
         img_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
+        #print(img_path_list)
         num_images = len(img_path_list)
         count = 1
         folder_label = 1
@@ -356,27 +365,63 @@ class LabelDatasets:
 
 
     def Get_Pedestrain_Dataset(self):
+        '''
+        func: Get_Pedestrain_Dataset
+            input: 
+                self.img_dir (image directory), For example : "/home/ali/Projects/datasets/BDD100K-ori/images/100k/train"
+                self.save_dir (save new datasets directory), For example : "../tools/bdd100k_data_pedestrain_2023-10-18"
+
+            return: 
+                BDD100K datasets include pedestrain labels
+
+            parameters:
+                INCLUDE_PEDESTRIAN_LABEL_METHOD
+                FILTER_OUT_ONLY_VEHICLE_LABEL_METHOD
+        '''
         im_path_list = glob.glob(os.path.join(self.img_dir,"*.jpg"))
-        # print(im_path_list)
+        #print(im_path_list)
         c = 1
         f_p = 1
         for i in range(len(im_path_list)):
+            # print("{}:{}".format(i+1,im_path_list[i]))
             label_exist = False
             label_path,dri_mask_path,dri_colormap_path,lane_mask_path,lane_colormap_path,label,dri_mask,lane_mask = self.Get_Label_Path(im_path_list[i])
-            # print("{}:{}".format(c,label_path))
-            # print("{}:{}".format(c,dri_mask_path))
-            # print("{}:{}".format(c,lane_mask_path))
+            # print("label_path {}:{}".format(c,label_path))
+            # print("dri_mask_path {}:{}".format(c,dri_mask_path))
+            # print("lane_mask_path {}:{}".format(c,lane_mask_path))
             find_wanted_label = False
+            # BDD100K Object Detection Labels
+            # 0: pedestrian
+            # 1: rider
+            # 2: car
+            # 3: truck
+            # 4: bus
+            # 5: train
+            # 6: motorcycle
+            # 7: bicycle
+            # 8: traffic light
+            # 9: traffic sign
+            # 10: stop sign
+            # 11: lane marking
+            INCLUDE_PEDESTRIAN_LABEL_METHOD=False
+            FILTER_OUT_ONLY_VEHICLE_LABEL_METHOD=True
+           
             if os.path.exists(label_path):
-                # print(label_path)
+                # print("label_path {} exist".format(label_path))
                 with open(label_path,"r") as f:
                     lines = f.readlines()
                     for line in lines:
                         # print(line)
                         la_str = line.split(" ")[0]
-                        if la_str=="0" or la_str=="1":
-                            find_wanted_label = True
-            
+                        if INCLUDE_PEDESTRIAN_LABEL_METHOD:
+                            if la_str=="0" or la_str=="1":
+                                find_wanted_label = True
+                        elif FILTER_OUT_ONLY_VEHICLE_LABEL_METHOD:
+                            if la_str=="0" or la_str=="1" or la_str=="6" or la_str=="7" or la_str=="10" or la_str=="11":
+                                find_wanted_label = True
+            else:
+                print("{} does not exist!!".format(label_path))
+                
             if find_wanted_label:
                 save_im_dir = os.path.join(self.save_dir,"images","train")
                 os.makedirs(save_im_dir,exist_ok=True)
@@ -439,7 +484,7 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data_pedestrain_2023-10-17/images/100k")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/images/100k/train")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
@@ -448,7 +493,7 @@ def get_args_label():
                         default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/bdd100k_data_pedestrain_2023-10-17")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/bdd100k_data_pedestrain_2023-10-19")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -464,12 +509,12 @@ if __name__=="__main__":
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
     #label.CorrectNumberOfImagesAndLablesInDatasets()
-    #label.SplitAllImagesToSpitFolders()
+    label.SplitAllImagesToSpitFolders()
     #label.Get_datasets_img_path_txt()
     #label.Get_datasets_img_path_txt()
     #label.Convert_labels()
     #label.Get_Pedestrain_Dataset()
-    label.Get_datasets_img_path_txt()
+    #label.Get_datasets_img_path_txt()
     #label.process_lane_map()
                         
 
