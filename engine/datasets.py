@@ -382,7 +382,7 @@ class BaseDatasets:
                     os.makedirs(save_im_dir,exist_ok=True)
                     img_file = self.im_path.split(os.sep)[-1]
                     save_img_path = os.path.join(save_im_dir,img_file)
-                    if IS_FAILED==False:
+                    if IS_FAILED==False and os.path.exists(self.label_path):
                         if self.method == "opencv":
                             print("save image")
                             cv2.imwrite(save_img_path,self.im)
@@ -394,7 +394,7 @@ class BaseDatasets:
 
                     #return NotImplemented
                 ## Save corresponding yolo label.txt
-                if self.save_txt and IS_FAILED==False:
+                if self.save_txt and IS_FAILED==False and os.path.exists(self.label_path):
                     print("save txt")
                     ## normalize xywh
                     x_s = str( int(float( (x) / self.im.shape[1] )*1000000)/1000000 ) 
@@ -442,42 +442,43 @@ class BaseDatasets:
                 return COPY_ORI_TXT_DONE
         else:
             ## Save image
-            save_im_dir = os.path.join(self.save_dir,"images")
-            os.makedirs(save_im_dir,exist_ok=True)
-            img_file = self.im_path.split(os.sep)[-1]
-            save_img_path = os.path.join(save_im_dir,img_file)
-           
-            print("save image")
-            cv2.imwrite(save_img_path,self.im)
+            if os.path.exists(self.label_path):
+                save_im_dir = os.path.join(self.save_dir,"images")
+                os.makedirs(save_im_dir,exist_ok=True)
+                img_file = self.im_path.split(os.sep)[-1]
+                save_img_path = os.path.join(save_im_dir,img_file)
+
+                print("save image")
+                cv2.imwrite(save_img_path,self.im)
                
 
-            if self.save_txt:
-                    print("save txt")
-                 
-                    ## Get corresponding label path
-                    img_file = self.im_path.split(os.sep)[-1]
-                    img_filename = img_file.split(".")[0]
+            if self.save_txt and os.path.exists(self.label_path):
+                print("save txt")
+                
+                ## Get corresponding label path
+                img_file = self.im_path.split(os.sep)[-1]
+                img_filename = img_file.split(".")[0]
 
-                    label_file = img_filename+".txt"
-                    save_label_dir = os.path.join(self.save_dir,"labels")
-                    os.makedirs(save_label_dir,exist_ok=True)
-                    self.save_label_path = os.path.join(save_label_dir,label_file)
+                label_file = img_filename+".txt"
+                save_label_dir = os.path.join(self.save_dir,"labels")
+                os.makedirs(save_label_dir,exist_ok=True)
+                self.save_label_path = os.path.join(save_label_dir,label_file)
 
-                    ## open save label.txt
-                    f_new=open(self.save_label_path,"a")
+                ## open save label.txt
+                f_new=open(self.save_label_path,"a")
 
-                    if COPY_ORI_TXT_DONE==False:
-                        ## Copy original label.txt into save label.txt
-                        with open(self.label_path,"r") as f:
-                            lines=f.readlines()
-                            for line in lines:
-                                f_new.write(line)
-                        
-                        COPY_ORI_TXT_DONE=True
-                        
-                        f.close()
-                    ## Add new stop sign label lxxywh into save label.txt
-                    f_new.close()
+                if COPY_ORI_TXT_DONE==False:
+                    ## Copy original label.txt into save label.txt
+                    with open(self.label_path,"r") as f:
+                        lines=f.readlines()
+                        for line in lines:
+                            f_new.write(line)
+                    
+                    COPY_ORI_TXT_DONE=True
+                    
+                    f.close()
+                ## Add new stop sign label lxxywh into save label.txt
+                f_new.close()
             return COPY_ORI_TXT_DONE
 
     def CopyPasteSimple(self):
