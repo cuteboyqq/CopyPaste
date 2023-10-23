@@ -23,6 +23,22 @@ class LaneMarkingDataset(BaseDatasets):
         if show_mask:
             self.Show_Image(mask,name="ori-mask",data_type="img",time=1000)
 
+
+        ## not overlapped with other bounding box
+        if os.path.exists(self.label_path):
+            with open(self.label_path,'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    line_list = line.split(" ")
+                    label = line_list[0]
+                    x = int(float(line_list[1])*self.im.shape[1])
+                    y = int(float(line_list[2])*self.im.shape[0])
+                    w = int(float(line_list[3])*self.im.shape[1])
+                    h = int(float(line_list[4])*self.im.shape[0])
+                    
+                    mask[y-int(h/2.0):y+int(h/2.0),x-int(w/2.0):x+int(w/2.0)] = (0,0,0)
+
+
         ## Not overlapped with Lane marking bounding boxes
         if self.save_label_path is not None:
             print(self.save_label_path)
@@ -159,9 +175,18 @@ class LaneMarkingDataset(BaseDatasets):
             lane_width = abs(right_x - left_x)
 
         ## initial roi_w, roi_h
-        self.roi_w = int(lane_width * 0.40)
+        if lane_width< self.im.shape[1] * 0.50:
+            self.roi_w = int(lane_width * 0.30) # 0.30 for nuImages
+        else:
+            self.roi_w = int(lane_width * 0.15)
+            
         ratio = float(self.roi_w/roi.shape[1])
-        self.roi_h = int(roi.shape[0]*ratio)
+        if ratio <= 1.1:
+            self.roi_h = int(roi.shape[0]*ratio)
+        else: # 2023-10-23 updated , let small lanemarking keep the small size
+            ratio = 1.1
+            self.roi_h = int(roi.shape[0]*ratio)
+            self.roi_w = int(roi.shape[1]*ratio)
         
         # ## check ratio
         # if ratio < 0.33:
