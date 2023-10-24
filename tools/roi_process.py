@@ -81,6 +81,13 @@ class ROIProcess:
         return file, file_name,path_dir,path_dir_dir
     
     def GetCorrespondingMasks(self):
+        '''
+        func: GetCorrespondingMasks
+        input: self.roi_dir
+               self.mask_dir
+        output:
+            save rois corresponding masks
+        '''
         roi_path_list = glob.glob(os.path.join(self.roi_dir,"*.jpg"))
         print(roi_path_list)
         c = 1
@@ -97,11 +104,17 @@ class ROIProcess:
                 c+=1
     
     def Rename_ROIs(self,name="Kaohsiung_Night_"):
-        ## need self.roi_dir
-        ##      self.save_dir
+        '''
+        func : Rename_ROIs
+        input: self.roi_dir
+                self.mask_dir
+               self.save_dir
+        '''
+      
         roi_path_list = glob.glob(os.path.join(self.roi_dir,"*.jpg"))
         print(roi_path_list)
         c = 1
+        os.makedirs(self.save_dir,exist_ok=True)
         for roi_path in roi_path_list:
             file, file_name, path_dir,path_dir_dir = self.parse_path_2(roi_path)
             print(path_dir_dir)
@@ -277,9 +290,12 @@ def get_args_roi():
     parser = argparse.ArgumentParser()
     ##   BDD100k datasets directory
     parser.add_argument('-datadir','--data-dir',help='data dir',default="/home/ali/Projects/datasets/nuimages/roi_train")
-    parser.add_argument('-savedir','--save-dir',help='save dir',default="./OP_TA_lanemarking_roi_New")
-    parser.add_argument('-roidir','--roi-dir',help='roi dir',default="/home/ali/Projects/datasets/roi_backup/landmark_roi/merge_openlanev2_taiwan/roi")
-    parser.add_argument('-maskdir','--mask-dir',help='mask dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/NU_TA_roi_rename/mask")
+    parser.add_argument('-savedir','--save-dir',help='save dir',\
+                        default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/datasets/ROI/lanemarking_nuimages_2023-10-23-Rename")
+    parser.add_argument('-roidir','--roi-dir',help='roi dir',\
+                        default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/datasets/ROI/lanemarking_nuimages_2023-10-23/roi")
+    parser.add_argument('-maskdir','--mask-dir',help='mask dir',\
+                        default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/datasets/ROI/lanemarking_nuimages_2023-10-23/mask")
     return parser.parse_args()
 
 
@@ -290,10 +306,10 @@ if __name__=="__main__":
     #roi.ParseNuImageROIDataset()
 
     #roi.Rename_ROIs(name="Kaohsiung_Night_")
-    roi.FilterImg(mask=True,
-              stop_sign=False,
-              equalize=False,
-              roi_th=100)
+    # roi.FilterImg(mask=True,
+    #           stop_sign=False,
+    #           equalize=False,
+    #           roi_th=100)
     #roi.GetCorrespondingMasks()
-    # roi.Rename_ROIs(name="nuimg_taiwan_")
+    roi.Rename_ROIs(name="nuimg_20231023_")
 

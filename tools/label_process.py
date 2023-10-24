@@ -56,6 +56,9 @@ class LabelDatasets:
 
         self.lane_mapping = {0:255,  1:2,  2:0,  3:3,   4:32,   5:4}
 
+        ## Get semantic labels
+        self.detection_labeldir = args.detection_labeldir
+        self.datasetB_labeldir = args.datasetB_labeldir
 
     def parse_path(self,path):
         file = path.split("/")[-1]
@@ -120,7 +123,7 @@ class LabelDatasets:
         if len(val_img_path_list)==0:
             val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.png"))
 
-        train_f = open("train_new_2023-10-19.txt","a")
+        train_f = open("train_new_2023-10-20.txt","a")
         for i in range(len(train_img_path_list)):
             local_path = self.parse_path_2(train_img_path_list[i])
             print("train {}:{}".format(i,local_path))
@@ -130,7 +133,7 @@ class LabelDatasets:
         train_f.close()
 
 
-        val_f = open("val_new_2023-10-19.txt","a")
+        val_f = open("val_new_2023-10-20.txt","a")
         for i in range(len(val_img_path_list)):
             local_path = self.parse_path_2(val_img_path_list[i])
             print("val {}:{}".format(i,local_path))
@@ -324,11 +327,12 @@ class LabelDatasets:
     def Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB(self):
         """
         2023-10-19
+        func: Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB
         input:
-            self.datasetA_dir, for example: "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-19/infer_result"
+            self.datasetA_dir, for example: "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-21/infer_result_yolov8"
             self.datasetB_dir, for example: "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/labels/detection/train"
             self.wanted_label_list
-            self.save_dir
+            self.save_dir, for example: ""
         output:
             merged datasetC
         """
@@ -355,7 +359,21 @@ class LabelDatasets:
             # 9: traffic sign
             # 10: stop sign
             # 11: lane marking
-        det_mapping = {4:8, 5:9, 6:10, 7:11}
+           # coco 80 classes
+            # 0:person
+            # 1:bicycle
+            # 2:car
+            # 3:motorcycle
+            # 4:airplane
+            # 5:bus
+            # 6:train
+            # 7:truck
+            # 8:boat
+            # 9:traffic light
+            # 10:fire hydrant
+            # 11:stop sign
+        #det_mapping = {5:9,7:11}
+        det_mapping = {9:8,11:10}
         datasetA_label_path_list = glob.glob(os.path.join(self.datasetA_dir,"***","**","*.txt"))
         #print(datasetA_label_path_list)
         for i in range(len(datasetA_label_path_list)):
@@ -384,7 +402,8 @@ class LabelDatasets:
                     for line in lines:
                         #print(line)
                         la_str = line.split(" ")[0]
-                        if la_str=="4" or la_str=="5" or la_str=="6" or la_str=="7":
+                        #if la_str=="5" or la_str=="7":
+                        if la_str=="11" or la_str=="9": #stop sign
                             BDD100K_label = det_mapping[int(la_str)]
                             new_line = str(BDD100K_label) + ' ' \
                                         + line.split(" ")[1] + ' '\
@@ -400,6 +419,70 @@ class LabelDatasets:
 
         return NotImplemented
 
+
+    def Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels(self):
+        '''
+        func: Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels
+        input : self.detection_labeldir = "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImages_train_relabel_1500_2023-10-24/labels"
+                self.datasetB_labeldir = "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/labels"
+        output : Get corresponding semantic labels
+        '''
+        object_label_path_list = glob.glob(os.path.join(self.detection_labeldir,"***","**","*.txt"))
+        for i in range(len(object_label_path_list)):
+            print(object_label_path_list[i])
+            label = self.Parse_Path(object_label_path_list[i])
+            label_name = label.split(".")[0]
+            print("{}:{}".format(i,label_name))
+            
+            # Get datasetB label drivable mask
+            label_drivable = label_name + ".png"
+            datasetB_drivable_mask_path = os.path.join(self.datasetB_labeldir,"drivable","masks","train",label_drivable)
+            save_drivable_mask_dir = os.path.join(self.detection_labeldir,"drivable","masks","train")
+            os.makedirs(save_drivable_mask_dir,exist_ok=True)
+            if not os.path.exists(os.path.join(save_drivable_mask_dir,label_drivable)):
+                shutil.copy(datasetB_drivable_mask_path,save_drivable_mask_dir)
+                print("copy drivable mask successful !")
+            else:
+                print("drivable masks exist, PASS !!")
+
+            # Get datasetB label drivable colormaps
+            label_colormaps = label_name + ".png"
+            datasetB_colormaps_mask_path = os.path.join(self.datasetB_labeldir,"drivable","colormaps","train",label_colormaps)
+            save_colormaps_mask_dir = os.path.join(self.detection_labeldir,"drivable","colormaps","train")
+            os.makedirs(save_colormaps_mask_dir,exist_ok=True)
+            if not os.path.exists(os.path.join(save_colormaps_mask_dir,label_colormaps)):
+                shutil.copy(datasetB_colormaps_mask_path,save_colormaps_mask_dir)
+                print("copy drivable colormaps successful !")
+            else:
+                print("drivable colormaps exist, PASS !!")
+            
+            # Get datasetB label lane mask
+            label_lane_mask = label_name + ".png"
+            datasetB_lane_mask_path = os.path.join(self.datasetB_labeldir,"lane","masks","train",label_lane_mask)
+            save_lane_mask_dir = os.path.join(self.detection_labeldir,"lane","masks","train")
+            os.makedirs(save_lane_mask_dir,exist_ok=True)
+            if not os.path.exists(os.path.join(save_lane_mask_dir,label_lane_mask)):
+                shutil.copy(datasetB_lane_mask_path,save_lane_mask_dir)
+                print("copy lane mask successful !")
+            else:
+                print("lane masks exist, PASS !!")
+
+            # Get datasetB label lane colormaps
+            label_lane_colormap = label_name + ".png"
+            datasetB_lane_colormap_path = os.path.join(self.datasetB_labeldir,"lane","colormaps","train",label_lane_colormap)
+            save_lane_colormap_dir = os.path.join(self.detection_labeldir,"lane","colormaps","train")
+            os.makedirs(save_lane_colormap_dir,exist_ok=True)
+            if not os.path.exists(os.path.join(save_lane_colormap_dir,label_lane_colormap)):
+                shutil.copy(datasetB_lane_colormap_path,save_lane_colormap_dir)
+                print("copy lane colormap successful !")
+            else:
+                print("lane colormap exist, PASS !!")
+            
+            
+
+            
+
+        return NotImplemented
 
     def Get_Label_Path(self,im_path):
         '''
@@ -573,7 +656,7 @@ def get_args_label():
     
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/datasets/bdd100k_data_pedestrain_2023-10-19/images/100k")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default="/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/images/100k/train")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
@@ -582,7 +665,7 @@ def get_args_label():
                         default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/bdd100k_data_pedestrain_2023-10-19-MergeLabel")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="../tools/bdd100k_data_pedestrain_2023-10-24-MergeLabel-YOLO")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -593,11 +676,22 @@ def get_args_label():
 
 
     ##==============Func: Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB====================================
+    # parser.add_argument('-datasetAdir','--datasetA-dir',help='image dir',default=\
+    #                     "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-24/infer_result")
+    # parser.add_argument('-datasetBdir','--datasetB-dir',help='image dir',default=\
+    #                     "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/labels/detection/train")
+    # Second step~~
     parser.add_argument('-datasetAdir','--datasetA-dir',help='image dir',default=\
-                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-19/infer_result")
+                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-24/infer_result_yolov8")
     parser.add_argument('-datasetBdir','--datasetB-dir',help='image dir',default=\
-                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/labels/detection/train")
+                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/bdd100k_data_pedestrain_2023-10-24-MergeLabel/labels/detection/train")
 
+
+    ##==============Func: Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels====================================
+    parser.add_argument('-detectionlabeldir','--detection-labeldir',help='detection label dir',default=\
+                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImages_train_relabel_1500_2023-10-24/labels")
+    parser.add_argument('-datasetBlabeldir','--datasetB-labeldir',help='datasetB label dir',default=\
+                        "/home/ali/Projects/GitHub_Code/ali/CopyPaste/tools/nuImage_data_include_pedestrain/labels")
     return parser.parse_args()
 
 if __name__=="__main__":
@@ -608,8 +702,9 @@ if __name__=="__main__":
     #label.CorrectNumberOfImagesAndLablesInDatasets()
     #label.SplitAllImagesToSpitFolders()
     #label.Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB()
+    label.Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels()
     #label.Get_datasets_img_path_txt()
-    label.Get_datasets_img_path_txt()
+    #label.Get_datasets_img_path_txt()
     #label.Convert_labels()
     #label.Get_Pedestrain_Dataset()
     #label.Get_datasets_img_path_txt()
