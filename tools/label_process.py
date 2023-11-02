@@ -64,7 +64,7 @@ class LabelDatasets:
         self.wanted_label = args.wanted_label
 
     def parse_path(self,path):
-        file = path.split("/")[-1]
+        file = path.split(os.sep)[-1]
         file_name = file.split(".")[0]
         return file,file_name
         
@@ -86,34 +86,50 @@ class LabelDatasets:
             f.close()
             f_new.close()
 
-    def SplitAllImagesToSpitFolders(self,split_count):
+    def SplitAllImagesToSpitFolders(self,split_count,have_txt=False):
         '''
         func:SplitAllImagesToSpitFolders
         input:
             self.img_dir
             self.save_dir
+            self.label_dir
+            have_txt
         output:
             image in split folders
         '''
-        img_path_list = glob.glob(os.path.join(self.img_dir,"*.png"))
+        img_path_list = glob.glob(os.path.join(self.img_dir,"**","*.png"))
+        if len(img_path_list)==0:
+            img_path_list = glob.glob(os.path.join(self.img_dir,"*.png"))
         #print(img_path_list)
         num_images = len(img_path_list)
         count = 1
         folder_label = 1
-        COPY = False
-        MOVE = True
+        COPY = True
+        MOVE = False
         for i in range(len(img_path_list)):
             save_folder = "train_" + str(int((i+1)/split_count)+1)
             img_path = img_path_list[i]
             file,file_name = self.parse_path(img_path)
-            save_dir = os.path.join(self.save_img_dir,save_folder)
+            save_dir = os.path.join(self.save_dir,save_folder,"images")
+            save_label_dir = os.path.join(self.save_dir,save_folder,"labels")
             os.makedirs(save_dir,exist_ok=True)
+            os.makedirs(save_label_dir,exist_ok=True)
             if COPY:
                 shutil.copy(img_path,save_dir)
-                print("{} : copy successful".format(i))
+                print("{} : copy image successful".format(i))
             if MOVE:
                 shutil.move(img_path,save_dir)
-                print("{} : move successful".format(i))
+                print("{} : move image successful".format(i))
+            if have_txt:
+                label = file_name + ".txt"
+                label_path = os.path.join(self.label_dir,label)
+                if os.path.exists(label_path):
+                    if COPY:
+                        shutil.copy(label_path,save_label_dir)
+                        print("{} : copy label successful".format(i))
+                    if MOVE:
+                        shutil.move(label_path,save_label_dir)
+                        print("{} : move label successful".format(i))
             i+=1
     
     def parse_path_2(self,path):
@@ -131,7 +147,7 @@ class LabelDatasets:
         if len(val_img_path_list)==0:
             val_img_path_list = glob.glob(os.path.join(self.img_dir,"val","*.png"))
 
-        train_f = open("train_new_2023-10-30.txt","a")
+        train_f = open("train_new_2023-11-01.txt","a")
         for i in range(len(train_img_path_list)):
             local_path = self.parse_path_2(train_img_path_list[i])
             print("train {}:{}".format(i,local_path))
@@ -141,7 +157,7 @@ class LabelDatasets:
         train_f.close()
 
 
-        val_f = open("val_new_2023-10-30.txt","a")
+        val_f = open("val_new_2023-11-01.txt","a")
         for i in range(len(val_img_path_list)):
             local_path = self.parse_path_2(val_img_path_list[i])
             print("val {}:{}".format(i,local_path))
@@ -153,7 +169,9 @@ class LabelDatasets:
     ## func: process_lane_map
     ## Erode the maps
     def process_lane_map(self):
+        print(self.lane_dir)
         lane_map_path_list = glob.glob(os.path.join(self.lane_dir,self.process_type,"*.png"))
+        print(lane_map_path_list)
         for i in range(len(lane_map_path_list)):
             print(lane_map_path_list[i])
             print(len(lane_map_path_list))
@@ -224,6 +242,13 @@ class LabelDatasets:
             print("{}:save to .png successful".format(i))
 
     def Convert_labels(self):
+        '''
+        Convert_labels
+        Needs : self.lane_dir
+                self.save_dir
+        output :
+                Convert_labels maps (.png)
+        '''
         print(self.lane_dir)
         img_path_list = glob.glob(os.path.join(self.lane_dir,"*.png"))
         
@@ -670,23 +695,24 @@ def get_args_label():
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
     parser.add_argument('-imgdir','--img-dir',help='image dir',\
-                        default="/home/ali/Projects/datasets/NightOwls/images/nightowls_training/nightowls_training")
-    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/detection/train")
+                        default="/home/ali/Projects/GitHub_Code/ali/NightOwls/labels_2023-11-01/images")
+    parser.add_argument('-labeldir','--label-dir',help='yolo label dir',\
+                        default="/home/ali/Projects/GitHub_Code/ali/NightOwls/labels_2023-11-01/labels")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
     
     parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
-                        default="/home/ali/Projects/datasets/nuimages/nuimage_data/labels/lane/masks/train")
+                        default="/home/ali/Projects/datasets/NightOwls/labels/part1/lane")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/datasets/NightOwls/images")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/datasets/NightOwls/images_split")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
     parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
 
-    parser.add_argument('-processtype','--process-type',help='proxess type',default="colormap")
+    parser.add_argument('-processtype','--process-type',help='process type',default="colormaps")
 
 
     ##==============Func: Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB====================================
@@ -719,7 +745,7 @@ if __name__=="__main__":
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
     #label.CorrectNumberOfImagesAndLablesInDatasets()
-    label.SplitAllImagesToSpitFolders(5000)
+    label.SplitAllImagesToSpitFolders(2500,have_txt=True)
     #label.Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB()
     #label.Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels()
     #label.Get_datasets_img_path_txt()
