@@ -63,6 +63,12 @@ class LabelDatasets:
 
         self.wanted_label = args.wanted_label
 
+
+        ##split dataset
+        self.dataset_dir = args.dataset_dir
+        self.savesplitdataset_dir = args.savesplitdataset_dir
+        self.val_count = args.val_count
+
     def parse_path(self,path):
         file = path.split(os.sep)[-1]
         file_name = file.split(".")[0]
@@ -518,6 +524,133 @@ class LabelDatasets:
 
         return NotImplemented
 
+    def Split_Train_dataset(self):
+        '''
+        Move_Images_And_Corresponding_Labels_To_Another_Folder
+            self.dataset_dir = args.dataset_dir
+            self.savesplitdataset_dir = args.savesplitdataset_dir
+            self.val_count = args.val_count
+        '''
+        train_label_path_list = glob.glob(os.path.join(self.dataset_dir,"labels","detection","train","*.txt"))
+        print(train_label_path_list)
+        print(self.val_count)
+
+        save_train_detection_dir = os.path.join(self.savesplitdataset_dir,"labels","detection","train")
+        save_val_detection_dir = os.path.join(self.savesplitdataset_dir,"labels","detection","val")
+        os.makedirs(save_train_detection_dir,exist_ok=True)
+        os.makedirs(save_val_detection_dir,exist_ok=True)
+
+        max_val_count = 0
+        if self.val_count <= len(train_label_path_list):
+            max_val_count = self.val_count
+        else:
+            max_val_count = len(train_label_path_list)
+        
+        for i in range(len(train_label_path_list)):
+            label_file,filename = self.parse_path(train_label_path_list[i])
+            ## val
+            if i<max_val_count:
+                #Copy image to save val/...
+                image_file = filename + ".jpg"
+                image_path = os.path.join(self.dataset_dir,"images","100k","train",image_file)
+                save_img_dir = os.path.join(self.savesplitdataset_dir,"images","100k","val")
+                os.makedirs(save_img_dir,exist_ok=True)
+                shutil.copy(image_path,save_img_dir)
+                print(f"Copy image to val successful")
+                #Copy label.txt to save val/...
+                save_label_dir = os.path.join(self.savesplitdataset_dir,"labels","detection","val")
+                os.makedirs(save_label_dir,exist_ok=True)
+                shutil.copy(train_label_path_list[i],save_label_dir)
+                print(f"Copy label to val successful")
+
+
+                #Copy drivable mask to save val/...
+                drivable_file = filename + ".png"
+                drivable_file_path = os.path.join(self.dataset_dir,"labels","drivable","masks","train",drivable_file)
+                save_drivable_mask_dir = os.path.join(self.savesplitdataset_dir,"labels","drivable","masks","val")
+                os.makedirs(save_drivable_mask_dir,exist_ok=True)
+                shutil.copy(drivable_file_path,save_drivable_mask_dir)
+                print(f"Copy drivable to val successful")
+
+                #Copy drivable colormaps to save val/...
+                drivable_file = filename + ".png"
+                drivable_file_path = os.path.join(self.dataset_dir,"labels","drivable","colormaps","train",drivable_file)
+                save_drivable_colormap_dir = os.path.join(self.savesplitdataset_dir,"labels","drivable","colormaps","val")
+                os.makedirs(save_drivable_colormap_dir,exist_ok=True)
+                shutil.copy(drivable_file_path,save_drivable_colormap_dir)
+                print(f"Copy drivable to val successful")
+
+                # Copy lane mask to save val/...
+                lane_file = filename + ".png"
+                lane_file_path = os.path.join(self.dataset_dir,"labels","lane","masks","train",lane_file)
+                save_lane_mask_dir = os.path.join(self.savesplitdataset_dir,"labels","lane","masks","val")
+                os.makedirs(save_lane_mask_dir,exist_ok=True)
+                shutil.copy(lane_file_path,save_lane_mask_dir)
+                print(f"Copy lane to val successful") 
+
+
+                # Copy lane colormaps to save val/...
+                lane_file = filename + ".png"
+                lane_file_path = os.path.join(self.dataset_dir,"labels","lane","colormaps","train",lane_file)
+                save_lane_colormap_dir = os.path.join(self.savesplitdataset_dir,"labels","lane","colormaps","val")
+                os.makedirs(save_lane_colormap_dir,exist_ok=True)
+                shutil.copy(lane_file_path,save_lane_colormap_dir)
+                print(f"Copy lane to val successful") 
+                print(f"{i}:{train_label_path_list[i]}")
+            else:
+                #Copy image to save train/...
+                image_file = filename + ".jpg"
+                image_path = os.path.join(self.dataset_dir,"images","100k","train",image_file)
+                save_img_dir = os.path.join(self.savesplitdataset_dir,"images","100k","train")
+                os.makedirs(save_img_dir,exist_ok=True)
+                print(f"Copy image to train successful") 
+                shutil.copy(image_path,save_img_dir)
+                #Copy label.txt to save val/...
+                save_label_dir = os.path.join(self.savesplitdataset_dir,"labels","detection","train")
+                os.makedirs(save_label_dir,exist_ok=True)
+                shutil.copy(train_label_path_list[i],save_label_dir)
+                print(f"Copy label to train successful")
+
+                #Copy drivable mask to save val/...
+                drivable_file = filename + ".png"
+                drivable_file_path = os.path.join(self.dataset_dir,"labels","drivable","masks","train",drivable_file)
+                save_drivable_mask_dir = os.path.join(self.savesplitdataset_dir,"labels","drivable","masks","train")
+                os.makedirs(save_drivable_mask_dir,exist_ok=True)
+                shutil.copy(drivable_file_path,save_drivable_mask_dir)
+                print(f"Copy drivable masks to train successful")
+
+                #Copy drivable colormaps to save val/...
+                drivable_file = filename + ".png"
+                drivable_file_path = os.path.join(self.dataset_dir,"labels","drivable","colormaps","train",drivable_file)
+                save_drivable_colormap_dir = os.path.join(self.savesplitdataset_dir,"labels","drivable","colormaps","train")
+                os.makedirs(save_drivable_colormap_dir,exist_ok=True)
+                shutil.copy(drivable_file_path,save_drivable_colormap_dir)
+                print(f"Copy drivable colormaps to train successful") 
+
+                # Copy lane mask to save cal/...
+                lane_file = filename + ".png"
+                lane_file_path = os.path.join(self.dataset_dir,"labels","lane","masks","train",lane_file)
+                save_lane_mask_dir = os.path.join(self.savesplitdataset_dir,"labels","lane","masks","train")
+                os.makedirs(save_lane_mask_dir,exist_ok=True)
+                shutil.copy(lane_file_path,save_lane_mask_dir) 
+                print(f"Copy lane masks to train successful") 
+
+                # Copy lane colormaps to save cal/...
+                lane_file = filename + ".png"
+                lane_file_path = os.path.join(self.dataset_dir,"labels","lane","colormaps","train",lane_file)
+                save_lane_colormap_dir = os.path.join(self.savesplitdataset_dir,"labels","lane","colormaps","train")
+                os.makedirs(save_lane_colormap_dir,exist_ok=True)
+                shutil.copy(lane_file_path,save_lane_colormap_dir) 
+                print(f"Copy lane colormaps to train successful") 
+                print(f"{i}:{train_label_path_list[i]}")
+            
+        return NotImplemented
+    
+    def parse_parh(self,path):
+        file = path.split(os.sep)[-1]
+        file_name = file.split(".")[0]
+        return file,file_name
+    
     def Get_Label_Path(self,im_path):
         '''
         the dataset format is  images/100k/train
@@ -736,6 +869,15 @@ def get_args_label():
     ##==============Func: Get_Particular_Label_Dataset====================================================================
     parser.add_argument('-wantedlabel','--wanted-label',help='wanted label',default=\
                         "lane marking")
+    ##===============Func: Split_Train_dataset==============================================
+    parser.add_argument('-datasetdir','--dataset-dir',help='dataset dir',default=\
+                        "/home/ali/Projects/datasets/nuimages/nuimages_data_relabeled_2023-10-30")
+    parser.add_argument('-savesplitdatasetdir','--savesplitdataset-dir',help='dataset dir',default=\
+                        "/home/ali/Projects/datasets/nuimages/nuimages_data_relabeled_split_2023-11-03")
+    parser.add_argument('-valcount','--val-count',type=int,default=2000,help='validation dataset count')
+
+
+
     return parser.parse_args()
     
 
@@ -745,7 +887,8 @@ if __name__=="__main__":
     label = LabelDatasets(label_parameters)
     #label.RemoveLabelsInLabelTXT()
     #label.CorrectNumberOfImagesAndLablesInDatasets()
-    label.SplitAllImagesToSpitFolders(2500,have_txt=True)
+    #label.SplitAllImagesToSpitFolders(2500,have_txt=True)
+    label.Split_Train_dataset()
     #label.Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB()
     #label.Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels()
     #label.Get_datasets_img_path_txt()
