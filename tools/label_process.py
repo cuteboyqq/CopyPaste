@@ -54,7 +54,56 @@ class LabelDatasets:
         #         55: lane_bg,
         #         255: lane_bg}
 
-        self.lane_mapping = {0:255,  1:2,  2:0,  3:3,   4:32,   5:4}
+        # lane_mapping: {0: vertical single white,            1: lane_bg,     2: vertical double white,           3: vertical yellow,           4: road curb, 
+        #         5: lane_bg,     6: vertical single white,           7: vertical yellow,           8: lane_bg,     9: lane_bg,
+        #         10: lane_bg,    11: lane_bg,    12: lane_bg,    13: lane_bg,    14: lane_bg,
+        #         15: lane_bg,    16: vertical single white,          17: lane_bg,    18: vertical double white,          19: vertical yellow,
+        #         20: road curb,          21: lane_bg,    22: vertical single white,          23: vertical yellow,          24: lane_bg,
+        #         25: lane_bg,    26: lane_bg,    27: lane_bg,    28: lane_bg,    29: lane_bg,
+        #         30: lane_bg,    31: lane_bg,    32: horizontal single white,          33: lane_bg,    34: lane_bg,  
+        #         35: lane_bg,    36: road curb,          37: lane_bg,    38: horizontal single white,          39: lane_bg,
+        #         40: lane_bg,    41: lane_bg,    42: lane_bg,    43: lane_bg,    44: lane_bg,
+        #         45: lane_bg,    46: lane_bg,    47: lane_bg,    48: horizontal single white,          49: lane_bg,
+        #         50: lane_bg,    51: lane_bg,    52: road curb,          53: lane_bg,    54: horizontal single white,
+        #         55: lane_bg,
+        #         255: lane_bg}
+
+        # names_drive:
+        #     0: direct area
+        #     1: alternative area
+        #     2: background
+        # names_lane:
+        #     0: background
+        #     1: vertical double white
+        #     2: vertical single white
+        #     3: vertical yellow
+        #     4: horizontal single white
+        #     5: road curb
+
+        # label at labelme
+        # 0:_background_
+        # 1: crosswalk
+        # 2: double other
+        # 3: double white
+        # 4: double yellow
+        # 5: road curb
+        # 6: single other
+        # 7: single white
+        # 8: single yellow
+        
+        # self.lane_mapping = {0:255,  1:2,  2:0,  3:3,   4:32,   5:4}
+        self.lane_mapping = {0:1,  1:32,  2:2,  3:18,  4:7,  5:4, 6:0, 7:0, 8:19 }
+        
+        # label at labelme
+        # _background_
+        # 0: direct
+        # 1: alternative
+
+        # Official BDD100K
+        # 0: direct
+        # 1: alternative
+        # 2: background
+        self.drivable_mapping = {0:2,   1:0,   2:1}
 
         ## Get semantic labels
         self.detection_labeldir = args.detection_labeldir
@@ -247,7 +296,7 @@ class LabelDatasets:
             cv2.imwrite(save_im_path,im)
             print("{}:save to .png successful".format(i))
 
-    def Convert_labels(self):
+    def Convert_labels(self,type=None):
         '''
         Convert_labels
         Needs : self.lane_dir
@@ -255,13 +304,17 @@ class LabelDatasets:
         output :
                 Convert_labels maps (.png)
         '''
-        print(self.lane_dir)
-        img_path_list = glob.glob(os.path.join(self.lane_dir,"*.png"))
+        if type == "lane":
+            print(self.lane_dir)
+            img_path_list = glob.glob(os.path.join(self.lane_dir,"*.png"))
+        elif type == "drivable":
+            print(self.drivable_dir)
+            img_path_list = glob.glob(os.path.join(self.drivable_dir,"*.png"))
         
         for i in range(len(img_path_list)):
             print(img_path_list[i])
             mask = cv2.imread(img_path_list[i])
-            out = self.map_segment_labels(mask)
+            out = self.map_segment_labels(mask,type)
             file,filename = self.parse_path(img_path_list[i])
             save_im = filename + ".png"
             save_im_path = os.path.join(self.save_dir,save_im)
@@ -270,14 +323,21 @@ class LabelDatasets:
             print("{}:Convert_labels successful".format(i))
         return NotImplemented
     
-    def map_segment_labels(self,mask):
+    def map_segment_labels(self,mask,type=None):
         """Update the segmentation mask labels by the mapping variable."""
         out = np.empty((mask.shape), dtype=mask.dtype)
-        for k, v in self.lane_mapping.items():
-            #if isinstance(v, str):
-            #    out[mask == k] = bg_lb
-            #else:
-            out[mask == k] = v
+        if type == "lane":
+            for k, v in self.lane_mapping.items():
+                #if isinstance(v, str):
+                #    out[mask == k] = bg_lb
+                #else:
+                out[mask == k] = v
+        elif type == "drivable":
+            for k, v in self.drivable_mapping.items():
+                #if isinstance(v, str):
+                #    out[mask == k] = bg_lb
+                #else:
+                out[mask == k] = v
         return out
 
     
@@ -828,17 +888,17 @@ def get_args_label():
     # parser.add_argument('--removelabellist','-remove-labellist',type=list,nargs='+',default="9",help='remove label list')
 
     parser.add_argument('-imgdir','--img-dir',help='image dir',\
-                        default="/home/ali/Projects/GitHub_Code/ali/NightOwls/labels_2023-11-01/images")
+                        default="/home/ali/Projects/datasets/bdd100k_data_0.8_ver2/images/100k")
     parser.add_argument('-labeldir','--label-dir',help='yolo label dir',\
                         default="/home/ali/Projects/GitHub_Code/ali/NightOwls/labels_2023-11-01/labels")
     parser.add_argument('-drivabledir','--drivable-dir',help='drivable label dir', \
                         default="/home/ali/Projects/datasets/nuimages/nuimages-v1.0-all-samples/labels/drivable/train")
     
     parser.add_argument('-lanedir','--lane-dir',help='lane dir', \
-                        default="/home/ali/Projects/datasets/NightOwls/labels/part1/lane")
+                        default="/home/ali/Projects/datasets/snow_data/labels/lane/masks/train")
 
     ## Save parameters
-    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/datasets/NightOwls/images_split")
+    parser.add_argument('-savedir','--save-dir',help='save img dir',default="/home/ali/Projects/datasets/snow_data_lane_relabel")
     parser.add_argument('-saveimg','--save-img',type=bool,default=True,help='save pedestrain fake images')
     parser.add_argument('-savetxt','--save-txt',type=bool,default=True,help='save pedestrain yolo.txt')
     
@@ -888,12 +948,12 @@ if __name__=="__main__":
     #label.RemoveLabelsInLabelTXT()
     #label.CorrectNumberOfImagesAndLablesInDatasets()
     #label.SplitAllImagesToSpitFolders(2500,have_txt=True)
-    label.Split_Train_dataset()
+    #label.Split_Train_dataset()
     #label.Get_Wanted_Label_From_DatasetA_And_Put_Into_DatasetB()
     #label.Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels()
     #label.Get_datasets_img_path_txt()
     #label.Get_datasets_img_path_txt()
-    #label.Convert_labels()
+    label.Convert_labels(type="drivable")
     #label.Input_Detection_Labels_And_Get_Corresponding_Drivable_And_Lane_Labels()
     #label.Get_datasets_img_path_txt()
     #label.process_lane_map()
